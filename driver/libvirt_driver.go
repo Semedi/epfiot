@@ -8,19 +8,34 @@ import (
 	libvirtxml "github.com/libvirt/libvirt-go-xml"
 )
 
-type Libvirt_driver struct {
+type Libvirt struct {
 	Name string
+	conn *libvirt.Connect
 }
 
-func Create() {
+func (l *Libvirt) Init() {
+	fmt.Println("init")
+}
+
+func (l *Libvirt) Close() {
+	defer l.conn.Close()
+}
+
+func (l *Libvirt) List() {
+	fmt.Println("List")
+}
+
+func (l *Libvirt) Create() {
 	var drive uint
 	drive = 0
 
 	conn, err := libvirt.NewConnect("qemu:///system")
+
 	if err != nil {
 		log.Fatalf("failed to connect to qemu")
 	}
-	defer conn.Close()
+	l.conn = conn
+	//defer conn.Close()
 
 	domcfg := &libvirtxml.Domain{
 		Name: "demo01",
@@ -55,14 +70,14 @@ func Create() {
 
 	fmt.Println(xml)
 
-	domain, err := conn.DomainDefineXML(xml)
+	domain, err := l.conn.DomainDefineXML(xml)
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Println(domain)
 
-	doms, err := conn.ListAllDomains(libvirt.CONNECT_LIST_DOMAINS_INACTIVE)
+	doms, err := l.conn.ListAllDomains(libvirt.CONNECT_LIST_DOMAINS_INACTIVE)
 	if err != nil {
 		panic(err)
 	}

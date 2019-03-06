@@ -1,9 +1,11 @@
 package main
 
 import (
-	"github.com/semedi/epfiot/driver"
+	d "github.com/semedi/epfiot/driver"
 )
 
 func main() {
-	driver.Create()
+	driver := d.Driver{Controller: &d.Libvirt{Name: "test"}}
+
+	driver.Start()
 }

@@ -1,10 +1,18 @@
 package driver
 
-type Driver interface {
-	init()
-	create()
+type Controller interface {
+	Init()
+	Create()
+	List()
+	Close()
 }
 
-type Controller struct {
-	d Driver
+type Driver struct {
+	Controller
+}
+
+func (d *Driver) Start() {
+	d.Controller.Init()
+	d.Controller.Create()
+	d.Controller.Close()
 }
