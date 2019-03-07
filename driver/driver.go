@@ -14,5 +14,6 @@ type Driver struct {
 func (d *Driver) Start() {
 	d.Controller.Init()
 	d.Controller.Create()
+	d.Controller.List()
 	d.Controller.Close()
 }

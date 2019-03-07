@@ -22,7 +22,19 @@ func (l *Libvirt) Close() {
 }
 
 func (l *Libvirt) List() {
-	fmt.Println("List")
+	doms, err := l.conn.ListAllDomains(libvirt.CONNECT_LIST_DOMAINS_INACTIVE)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("%d running domains:\n", len(doms))
+	for _, dom := range doms {
+		name, err := dom.GetName()
+		if err == nil {
+			fmt.Printf("  %s\n", name)
+		}
+		dom.Free()
+	}
 }
 
 func (l *Libvirt) Create() {
@@ -35,7 +47,6 @@ func (l *Libvirt) Create() {
 		log.Fatalf("failed to connect to qemu")
 	}
 	l.conn = conn
-	//defer conn.Close()
 
 	domcfg := &libvirtxml.Domain{
 		Name: "demo01",
@@ -61,7 +72,10 @@ func (l *Libvirt) Create() {
 						Drive: &libvirtxml.DomainAddressDrive{
 							Controller: &drive, Bus: &drive, Target: &drive, Unit: &drive},
 					},
-				}}}}
+				},
+			},
+		},
+	}
 
 	xml, err := domcfg.Marshal()
 	if err != nil {
@@ -75,19 +89,5 @@ func (l *Libvirt) Create() {
 		panic(err)
 	}
 
-	fmt.Println(domain)
-
-	doms, err := l.conn.ListAllDomains(libvirt.CONNECT_LIST_DOMAINS_INACTIVE)
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Printf("%d running domains:\n", len(doms))
-	for _, dom := range doms {
-		name, err := dom.GetName()
-		if err == nil {
-			fmt.Printf("  %s\n", name)
-		}
-		dom.Free()
-	}
+	fmt.Println(domain.GetName())
 }
