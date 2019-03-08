@@ -5,7 +5,8 @@ import (
 )
 
 func main() {
-	driver := d.Driver{Controller: &d.Libvirt{Name: "test"}}
+
+	driver := d.Driver{Controller: d.New_kvm("qemu:///system")}
 
 	driver.Start()
 }

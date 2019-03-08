@@ -1,0 +1,21 @@
+<domain type="kvm">
+  <name>demo01</name>
+  <memory unit="MB" dumpCore="on">2048</memory>
+  <vcpu>1</vcpu>
+  <os>
+    <type>hvm</type>
+  </os>
+  <cpu mode="host-model"></cpu>
+  <devices>
+    <disk type="file">
+      <source file="/home/semedi/Downloads/alpine.qcow"></source>
+      <target dev="hda" bus="ide"></target>
+      <alias name="ide0-0-0"></alias>
+      <address type="drive" controller="0" bus="0" target="0" unit="0"></address>
+    </disk>
+    <console>
+      <target type="virtio"></target>
+    </console>
+    <graphics type="spice" autoport="yes"></graphics>
+  </devices>
+</domain>
