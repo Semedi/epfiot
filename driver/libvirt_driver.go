@@ -40,6 +40,15 @@ func domain_def() libvirtxml.Domain {
 		VCPU: &libvirtxml.DomainVCPU{Value: 1},
 		CPU:  &libvirtxml.DomainCPU{Mode: "host-model"},
 		Devices: &libvirtxml.DomainDeviceList{
+			Interfaces: []libvirtxml.DomainInterface{
+				{
+					Source: &libvirtxml.DomainInterfaceSource{
+						Bridge: &libvirtxml.DomainInterfaceSourceBridge{
+							Bridge: "epfiot_net",
+						},
+					},
+				},
+			},
 			Consoles: []libvirtxml.DomainConsole{
 				{
 					Target: &libvirtxml.DomainConsoleTarget{
