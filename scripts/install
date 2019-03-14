@@ -1,0 +1,71 @@
+#!/bin/bash
+
+FILE=appliance
+NET=epfiot_net
+NET_IP=10.0.0.1/8
+DEST_IP=10.0.0.2
+
+exec 2<&-
+
+cat > $FILE <<- /domain 
+<domain type="kvm">
+  <name>demo01</name>
+  <memory unit="MB" dumpCore="on">2048</memory>
+  <vcpu>1</vcpu>
+  <os>
+    <type>hvm</type>
+  </os>
+  <cpu mode="host-model"></cpu>
+  <devices>
+    <disk type="file">
+      <driver name="qemu" type="qcow2"></driver>
+      <source file="/home/semedi/Downloads/alpine.qcow2"></source>
+      <target dev="hda" bus="virtio"></target>
+    </disk>
+    <interface type="bridge">
+      <source bridge="$NET"></source>
+    </interface>
+    <graphics type="spice" autoport="yes"></graphics>
+  </devices>
+</domain>
+/domain
+
+if [ "$EUID" -ne 0 ]
+    then echo "Please run as root"
+    exit
+fi
+
+if [[ -n `ip a | grep $NET` ]]; then
+    ip link delete $NET type bridge
+fi
+
+ip link add name $NET type bridge
+ip link set $NET up
+ip addr add dev $NET $NET_IP
+
+virsh create $FILE
+
+if [ $? -eq 0 ]; then
+    rm $FILE
+
+    echo Main appliance created!
+else
+    rm $FILE
+
+    echo There is a problem trying to create the domain, closing...
+    exit -1
+fi
+
+#ping $DEST_IP -w 30
+#
+#if [ $? -ne 0 ]; then
+#    echo ip unrecheable
+#    exit -1
+#fi
+#
+#ssh -o ConnectTimeout=240 -u root -p root $DEST_IP "echo Connected"
+#
+#if [ $? -ne 0 ]; then
+#    echo host unreachable
+#    exit -1
+#fi

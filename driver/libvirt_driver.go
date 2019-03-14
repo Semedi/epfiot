@@ -49,13 +49,6 @@ func domain_def() libvirtxml.Domain {
 					},
 				},
 			},
-			Consoles: []libvirtxml.DomainConsole{
-				{
-					Target: &libvirtxml.DomainConsoleTarget{
-						Type: "virtio",
-					},
-				},
-			},
 			Graphics: []libvirtxml.DomainGraphic{
 				{
 					Spice: &libvirtxml.DomainGraphicSpice{
