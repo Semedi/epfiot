@@ -11,7 +11,8 @@ Edge Provisioning for Internet of Things
 - Alpine 3.9.2 (extended)
     - packages:
         * alpine-sdk
-        * libvirt
+        * libvirt-dev # including headers and pkgfile
+        * libvirt-qemu
         * go
             - epfiot (this repo)
             - libvirt-go

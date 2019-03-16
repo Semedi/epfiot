@@ -1,9 +1,15 @@
 #!/bin/bash
 
+if [ "$EUID" -ne 0 ]
+    then echo "Please run as root"
+    exit
+fi
+
 FILE=appliance
 NET=epfiot_net
 NET_IP=10.0.0.1/8
 DEST_IP=10.0.0.2
+DEFAULT=$(ip r | grep default | awk '{print $5}')
 
 exec 2<&-
 
@@ -30,11 +36,6 @@ cat > $FILE <<- /domain
 </domain>
 /domain
 
-if [ "$EUID" -ne 0 ]
-    then echo "Please run as root"
-    exit
-fi
-
 if [[ -n `ip a | grep $NET` ]]; then
     ip link delete $NET type bridge
 fi
@@ -55,6 +56,9 @@ else
     echo There is a problem trying to create the domain, closing...
     exit -1
 fi
+
+# give internet access to the appliance:
+iptables -t nat -A POSTROUTING -o $DEFAULT -j MASQUERADE
 
 #ping $DEST_IP -w 30
 #
