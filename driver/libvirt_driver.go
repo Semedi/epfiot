@@ -58,7 +58,7 @@ func domain_def() libvirtxml.Domain {
 			},
 			Disks: []libvirtxml.DomainDisk{
 				{
-					Source: &libvirtxml.DomainDiskSource{File: &libvirtxml.DomainDiskSourceFile{File: "/home/semedi/Downloads/alpine.qcow2"}},
+					Source: &libvirtxml.DomainDiskSource{File: &libvirtxml.DomainDiskSourceFile{File: "/home/semedi/Downloads/vm.qcow2"}},
 					Driver: &libvirtxml.DomainDiskDriver{Name: "qemu", Type: "qcow2"},
 					Target: &libvirtxml.DomainDiskTarget{Dev: "hda", Bus: "virtio"},
 				},

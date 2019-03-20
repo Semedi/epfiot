@@ -7,8 +7,8 @@ fi
 
 FILE=appliance
 NET=epfiot_net
-NET_IP=10.0.0.1/8
-DEST_IP=10.0.0.2
+NET_IP=192.168.100.1/24
+DEST_IP=192.168.100.2
 DEFAULT=$(ip r | grep default | awk '{print $5}')
 
 exec 2<&-
@@ -31,6 +31,10 @@ cat > $FILE <<- /domain
     <interface type="bridge">
       <source bridge="$NET"></source>
     </interface>
+    <interface type='network'>
+      <source network='epfiot-vm'/>
+    </interface>
+
     <graphics type="spice" autoport="yes"></graphics>
   </devices>
 </domain>
