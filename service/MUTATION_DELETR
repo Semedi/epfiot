@@ -1,0 +1,8 @@
+mutation {
+  addPet( pet: {ownerID: 1, name: "pene"}){
+    name
+  }
+    
+}
+
+seems that ! in schema means mandatory

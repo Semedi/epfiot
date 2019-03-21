@@ -1,0 +1,72 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+"The query type, represents all of the entry points into our object graph"
+type Query {
+  getUser(id: ID!): User
+  getUsers(): [User]
+  getVm(id: ID!): Vm
+  getTag(title: String!): Tag
+}
+
+"The mutation type, represents all updates we can make to our data"
+type Mutation {
+  addVm(vm: VmInput!): Vm
+  updateVm(vm: VmInput!): Vm
+  deleteVm(userID: ID!, vmID: ID!): Boolean
+}
+
+"what is needed for a vm"
+type Vm {
+  id: ID
+  owner: User
+  name: String
+  tags: [Tag]
+}
+
+"Tag has everything needed for a tag"
+type Tag {
+  id: ID
+  title: String
+  vms: [Vm]
+}
+
+"what is needed for a user"
+type User {
+  id: ID
+  name: String
+  # user vms exposed as a full list
+  vms: [Vm]
+  # user vms exposed as a connection with edges
+  vmsConnection(first: Int, after: ID): UserVmConnection!
+}
+
+"The connection between users and vms"
+type UserVmConnection {
+  totalCount: Int!
+  edges: [UserVmEdge]
+  pageInfo: PageInfo!
+}
+
+"The edge of the user vm connection"
+type UserVmEdge {
+  cursor: ID!
+  node: Vm
+}
+
+"Page info for pagination"
+type PageInfo {
+  startCursor: ID
+  endCursor: ID
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+}
+
+input VmInput {
+  id: ID
+  ownerID: ID!
+  name: String!
+  tagIDs: [Int]
+}
