@@ -34,33 +34,21 @@ func domain_def() libvirtxml.Domain {
 			},
 		},
 		Memory: &libvirtxml.DomainMemory{
-			Value:    2048,
+			Value:    512,
 			Unit:     "MB",
-			DumpCore: "on"},
-		VCPU: &libvirtxml.DomainVCPU{Value: 1},
-		CPU:  &libvirtxml.DomainCPU{Mode: "host-model"},
+			DumpCore: "on",
+		},
+		VCPU: &libvirtxml.DomainVCPU{
+			Placement: "static",
+			Value:     1,
+		},
+		CPU: &libvirtxml.DomainCPU{Mode: "host-model"},
 		Devices: &libvirtxml.DomainDeviceList{
-			Interfaces: []libvirtxml.DomainInterface{
-				{
-					Source: &libvirtxml.DomainInterfaceSource{
-						Bridge: &libvirtxml.DomainInterfaceSourceBridge{
-							Bridge: "epfiot_net",
-						},
-					},
-				},
-			},
 			Graphics: []libvirtxml.DomainGraphic{
 				{
 					Spice: &libvirtxml.DomainGraphicSpice{
 						AutoPort: "yes",
 					},
-				},
-			},
-			Disks: []libvirtxml.DomainDisk{
-				{
-					Source: &libvirtxml.DomainDiskSource{File: &libvirtxml.DomainDiskSourceFile{File: "/home/semedi/Downloads/vm.qcow2"}},
-					Driver: &libvirtxml.DomainDiskDriver{Name: "qemu", Type: "qcow2"},
-					Target: &libvirtxml.DomainDiskTarget{Dev: "hda", Bus: "virtio"},
 				},
 			},
 		},
@@ -93,9 +81,30 @@ func (l *Libvirt) List() {
 	}
 }
 
+func setDevices(d *libvirtxml.Domain) {
+	d.Devices.Interfaces = []libvirtxml.DomainInterface{
+		{
+			Source: &libvirtxml.DomainInterfaceSource{
+				Network: &libvirtxml.DomainInterfaceSourceNetwork{
+					Network: "epfiot-vm",
+				},
+			},
+		},
+	}
+	d.Devices.Disks = []libvirtxml.DomainDisk{
+		{
+			Source: &libvirtxml.DomainDiskSource{File: &libvirtxml.DomainDiskSourceFile{File: "/home/semedi/Downloads/vm.qcow2"}},
+			Driver: &libvirtxml.DomainDiskDriver{Name: "qemu", Type: "qcow2"},
+			Target: &libvirtxml.DomainDiskTarget{Dev: "hda", Bus: "virtio"},
+		},
+	}
+}
+
 func (l *Libvirt) Create() {
 	domcfg := domain_def()
-	domcfg.Name = "demo01"
+	domcfg.Name = "demo02"
+
+	setDevices(&domcfg)
 
 	xml, err := domcfg.Marshal()
 	if err != nil {
