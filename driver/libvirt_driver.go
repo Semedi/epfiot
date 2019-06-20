@@ -93,7 +93,7 @@ func setDevices(d *libvirtxml.Domain) {
 	}
 	d.Devices.Disks = []libvirtxml.DomainDisk{
 		{
-			Source: &libvirtxml.DomainDiskSource{File: &libvirtxml.DomainDiskSourceFile{File: "/home/semedi/Downloads/vm.qcow2"}},
+			Source: &libvirtxml.DomainDiskSource{File: &libvirtxml.DomainDiskSourceFile{File: "/home/semedi/Virtual/vm.qcow2"}},
 			Driver: &libvirtxml.DomainDiskDriver{Name: "qemu", Type: "qcow2"},
 			Target: &libvirtxml.DomainDiskTarget{Dev: "hda", Bus: "virtio"},
 		},

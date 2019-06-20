@@ -1,4 +1,4 @@
-package main
+package service
 
 import (
 	"io/ioutil"
@@ -11,8 +11,8 @@ import (
 	"github.com/graph-gophers/graphql-go/relay"
 )
 
-func main() {
-	s, err := ioutil.ReadFile("./schema")
+func Run() {
+	s, err := ioutil.ReadFile("service/schema")
 
 	if err != nil {
 		log.Fatalf("failed read schema")
@@ -37,6 +37,21 @@ func main() {
 	log.WithFields(log.Fields{"time": time.Now()}).Info("starting server")
 	log.Fatal(http.ListenAndServe("localhost:8080", logged(mux)))
 
+}
+
+// logging middleware
+func logged(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now().UTC()
+
+		next.ServeHTTP(w, r)
+
+		log.WithFields(log.Fields{
+			"path":    r.RequestURI,
+			"IP":      r.RemoteAddr,
+			"elapsed": time.Now().UTC().Sub(start),
+		}).Info()
+	})
 }
 
 var page = []byte(`
@@ -77,17 +92,3 @@ var page = []byte(`
 </html>
 `)
 
-// logging middleware
-func logged(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		start := time.Now().UTC()
-
-		next.ServeHTTP(w, r)
-
-		log.WithFields(log.Fields{
-			"path":    r.RequestURI,
-			"IP":      r.RemoteAddr,
-			"elapsed": time.Now().UTC().Sub(start),
-		}).Info()
-	})
-}
