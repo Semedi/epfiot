@@ -1,0 +1,116 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+AddVm	service/resolver.go	/^func (r *Resolver) AddVm(ctx context.Context, args struct{ Vm vmInput }) (*VmResolver, error) {$/;"	f
+Close	driver/libvirt_driver.go	/^func (l *Libvirt) Close() {$/;"	f
+Controller	driver/driver.go	/^type Controller interface {$/;"	t
+Create	driver/libvirt_driver.go	/^func (l *Libvirt) Create() {$/;"	f
+Cursor	service/user-vm.go	/^func (u *UserVmEdge) Cursor(ctx context.Context) graphql.ID {$/;"	f
+DB	service/db.go	/^type DB struct {$/;"	t
+DashBoardPageHandler	service/server.go	/^func DashBoardPageHandler(w http.ResponseWriter, r *http.Request) {$/;"	f
+DeleteVm	service/resolver.go	/^func (r *Resolver) DeleteVm(ctx context.Context, args struct{ UserID, VmID graphql.ID }) (*bool, error) {$/;"	f
+Driver	driver/driver.go	/^type Driver struct {$/;"	t
+Edges	service/user-vm.go	/^func (u *UserVmsConnectionResolver) Edges(ctx context.Context) (*[]*UserVmEdge, error) {$/;"	f
+EndCursor	service/user-vm.go	/^func (u *PageInfo) EndCursor(ctx context.Context) *graphql.ID {$/;"	f
+GetTag	service/resolver.go	/^func (r *Resolver) GetTag(ctx context.Context, args struct{ Title string }) (*TagResolver, error) {$/;"	f
+GetUser	service/resolver.go	/^func (r *Resolver) GetUser(ctx context.Context, args struct{ ID graphql.ID }) (*UserResolver, error) {$/;"	f
+GetUserVms	service/db.go	/^func (db *DB) GetUserVms(ctx context.Context, id uint) ([]Vm, error) {$/;"	f
+GetUserbyName	service/db.go	/^func (db *DB) GetUserbyName(user string) (int) {$/;"	f
+GetUsers	service/resolver.go	/^func (r *Resolver) GetUsers(ctx context.Context) (*[]*UserResolver, error) {$/;"	f
+GetVm	service/resolver.go	/^func (r *Resolver) GetVm(ctx context.Context, args struct{ ID graphql.ID }) (*VmResolver, error) {$/;"	f
+HasNextPage	service/user-vm.go	/^func (u *PageInfo) HasNextPage(ctx context.Context) bool {$/;"	f
+HasPreviousPage	service/user-vm.go	/^func (u *PageInfo) HasPreviousPage(ctx context.Context) bool {$/;"	f
+ID	service/tags.go	/^func (t *TagResolver) ID(ctx context.Context) *graphql.ID {$/;"	f
+ID	service/users.go	/^func (u *UserResolver) ID(ctx context.Context) *graphql.ID {$/;"	f
+ID	service/vms.go	/^func (p *VmResolver) ID(ctx context.Context) *graphql.ID {$/;"	f
+Init	driver/driver.go	/^func (d *Driver) Init() {$/;"	f
+Init	driver/libvirt_driver.go	/^func (l *Libvirt) Init() {$/;"	f
+Libvirt	driver/libvirt_driver.go	/^type Libvirt struct {$/;"	t
+List	driver/libvirt_driver.go	/^func (l *Libvirt) List() {$/;"	f
+LoginPageHandler	service/server.go	/^func LoginPageHandler(w http.ResponseWriter, r *http.Request) {$/;"	f
+LogoutHandler	service/server.go	/^func LogoutHandler(w http.ResponseWriter, r *http.Request) {$/;"	f
+MainHandler	service/server.go	/^func MainHandler(w http.ResponseWriter, r *http.Request) {$/;"	f
+Name	service/users.go	/^func (u *UserResolver) Name(ctx context.Context) *string {$/;"	f
+Name	service/vms.go	/^func (p *VmResolver) Name(ctx context.Context) *string {$/;"	f
+New_kvm	driver/libvirt_driver.go	/^func New_kvm(c string) *Libvirt {$/;"	f
+Node	service/user-vm.go	/^func (u *UserVmEdge) Node(ctx context.Context) *VmResolver {$/;"	f
+Owner	service/vms.go	/^func (p *VmResolver) Owner(ctx context.Context) (*UserResolver, error) {$/;"	f
+PageInfo	service/user-vm.go	/^func (u *UserVmsConnectionResolver) PageInfo(ctx context.Context) (*PageInfo, error) {$/;"	f
+PageInfo	service/user-vm.go	/^type PageInfo struct {$/;"	t
+Resolver	service/resolver.go	/^type Resolver struct {$/;"	t
+Run	service/server.go	/^func Run() {$/;"	f
+Start	driver/driver.go	/^func (d *Driver) Start() {$/;"	f
+StartCursor	service/user-vm.go	/^func (u *PageInfo) StartCursor(ctx context.Context) *graphql.ID {$/;"	f
+Tag	service/tags.go	/^type Tag struct {$/;"	t
+TagResolver	service/tags.go	/^type TagResolver struct {$/;"	t
+Tags	service/vms.go	/^func (p *VmResolver) Tags(ctx context.Context) (*[]*TagResolver, error) {$/;"	f
+Title	service/tags.go	/^func (t *TagResolver) Title(ctx context.Context) *string {$/;"	f
+TotalCount	service/user-vm.go	/^func (u UserVmsConnectionResolver) TotalCount(ctx context.Context) int32 {$/;"	f
+UpdateVm	service/resolver.go	/^func (r *Resolver) UpdateVm(ctx context.Context, args struct{ Vm vmInput }) (*VmResolver, error) {$/;"	f
+User	service/users.go	/^type User struct {$/;"	t
+UserResolver	service/users.go	/^type UserResolver struct {$/;"	t
+UserVmEdge	service/user-vm.go	/^type UserVmEdge struct {$/;"	t
+UserVmsConnectionResolver	service/user-vm.go	/^type UserVmsConnectionResolver struct {$/;"	t
+User_by_name	utils/op.go	/^func User_by_name(user string) service.User {$/;"	f
+Vm	service/vms.go	/^type Vm struct {$/;"	t
+VmResolver	service/vms.go	/^type VmResolver struct {$/;"	t
+Vms	service/tags.go	/^func (t *TagResolver) Vms(ctx context.Context) (*[]*VmResolver, error) {$/;"	f
+Vms	service/users.go	/^func (u *UserResolver) Vms(ctx context.Context) (*[]*VmResolver, error) {$/;"	f
+VmsConnection	service/user-vm.go	/^func (u *UserResolver) VmsConnection(ctx context.Context, args vmsConnArgs) (*UserVmsConnectionResolver, error) {$/;"	f
+addVm	service/db.go	/^func (db *DB) addVm(ctx context.Context, input vmInput) (*Vm, error) {$/;"	f
+boolP	service/utils.go	/^func boolP(b bool) *bool {$/;"	f
+conf	driver/driver.go	/^type conf struct {$/;"	t
+dashBoardPage	service/const.go	/^const dashBoardPage = `<html><body>$/;"	c
+dashboardTemplate	service/server.go	/^var dashboardTemplate = template.Must(template.New("").Parse(dashBoardPage))$/;"	v
+decodeCursor	service/resolver.go	/^func decodeCursor(s string) (int, error) {$/;"	f
+deleteVm	service/db.go	/^func (db *DB) deleteVm(ctx context.Context, userID, VmID uint) (*bool, error) {$/;"	f
+domain_def	driver/libvirt_driver.go	/^func domain_def() libvirtxml.Domain {$/;"	f
+driver	driver/driver.go	/^package driver$/;"	p
+driver	driver/libvirt_driver.go	/^package driver$/;"	p
+encodeCursor	service/resolver.go	/^func encodeCursor(i int) graphql.ID {$/;"	f
+encryptionKey	service/server.go	/^var encryptionKey     = "something-very-secret"$/;"	v
+get	driver/driver.go	/^func (c *conf) get() *conf {$/;"	f
+getTagBytTitle	service/db.go	/^func (db *DB) getTagBytTitle(ctx context.Context, title string) (*Tag, error) {$/;"	f
+getTagVms	service/db.go	/^func (db *DB) getTagVms(ctx context.Context, t *Tag) ([]Vm, error) {$/;"	f
+getUser	service/db.go	/^func (db *DB) getUser(ctx context.Context, id uint) (*User, error) {$/;"	f
+getUserVmIDs	service/db.go	/^func (db *DB) getUserVmIDs(ctx context.Context, userID uint) ([]int, error) {$/;"	f
+getUsers	service/db.go	/^func (db *DB) getUsers(ctx context.Context) ([]User, error) {$/;"	f
+getVm	service/db.go	/^func (db *DB) getVm(ctx context.Context, id uint) (*Vm, error) {$/;"	f
+getVmOwner	service/db.go	/^func (db *DB) getVmOwner(ctx context.Context, id int32) (*User, error) {$/;"	f
+getVmTags	service/db.go	/^func (db *DB) getVmTags(ctx context.Context, p *Vm) ([]Tag, error) {$/;"	f
+getVmsByID	service/db.go	/^func (db *DB) getVmsByID(ctx context.Context, ids []int, from, to int) ([]Vm, error) {$/;"	f
+gqlIDP	service/utils.go	/^func gqlIDP(id uint) *graphql.ID {$/;"	f
+gqlIDToUint	service/utils.go	/^func gqlIDToUint(i graphql.ID) (uint, error) {$/;"	f
+init	service/server.go	/^func init() {$/;"	f
+int32P	service/utils.go	/^func int32P(i uint) *int32 {$/;"	f
+logUserPage	service/const.go	/^const logUserPage = `<html><body>$/;"	c
+logUserTemplate	service/server.go	/^var logUserTemplate   = template.Must(template.New("").Parse(logUserPage))$/;"	v
+logged	service/server.go	/^func logged(next http.Handler) http.Handler {$/;"	f
+loggedUserSession	service/server.go	/^var loggedUserSession = sessions.NewCookieStore([]byte(encryptionKey))$/;"	v
+main	epfiot.go	/^func main() {$/;"	f
+main	epfiot.go	/^package main$/;"	p
+mainPage	service/const.go	/^const mainPage = `<!DOCTYPE html>$/;"	c
+mainTemplate	service/server.go	/^var mainTemplate      = template.Must(template.New("").Parse(mainPage))$/;"	v
+newDB	service/db.go	/^func newDB(path string) (*DB, error) {$/;"	f
+service	service/const.go	/^package service$/;"	p
+service	service/db.go	/^package service$/;"	p
+service	service/examples.go	/^package service$/;"	p
+service	service/resolver.go	/^package service$/;"	p
+service	service/server.go	/^package service$/;"	p
+service	service/tags.go	/^package service$/;"	p
+service	service/user-vm.go	/^package service$/;"	p
+service	service/users.go	/^package service$/;"	p
+service	service/utils.go	/^package service$/;"	p
+service	service/vms.go	/^package service$/;"	p
+setDevices	driver/libvirt_driver.go	/^func setDevices(d *libvirtxml.Domain) {$/;"	f
+tags	service/examples.go	/^var tags = []Tag{$/;"	v
+updateVm	service/db.go	/^func (db *DB) updateVm(ctx context.Context, args *vmInput) (*Vm, error) {$/;"	f
+uri	driver/driver.go	/^func (c conf) uri() string {$/;"	f
+users	service/examples.go	/^var users = []User{$/;"	v
+utils	utils/op.go	/^package utils$/;"	p
+vmInput	service/resolver.go	/^type vmInput struct {$/;"	t
+vms	service/examples.go	/^var vms = []Vm{$/;"	v
+vmsConnArgs	service/user-vm.go	/^type vmsConnArgs struct {$/;"	t

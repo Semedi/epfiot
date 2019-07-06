@@ -23,6 +23,24 @@ var dashboardTemplate = template.Must(template.New("").Parse(dashBoardPage))
 var logUserTemplate   = template.Must(template.New("").Parse(logUserPage))
 var mainTemplate      = template.Must(template.New("").Parse(mainPage))
 
+
+type Server struct{
+    *DB
+}
+
+func New() *Server{
+    s := new(Server)
+
+	db, err := newDB("./db.sqlite")
+	if err != nil {
+		panic(err)
+	}
+
+    s.DB = db
+
+    return s
+}
+
 func DashBoardPageHandler(w http.ResponseWriter, r *http.Request) {
         conditionsMap := map[string]interface{}{}
         //read from session
@@ -141,19 +159,15 @@ func init() {
     }
 }
 
-func Run() {
-	s, err := ioutil.ReadFile("service/schema")
+func (s *Server) Run() {
+	fileschema, err := ioutil.ReadFile("service/schema")
 
 	if err != nil {
 		log.Fatalf("failed read schema")
 	}
 
-	db, err := newDB("./db.sqlite")
-	if err != nil {
-		panic(err)
-	}
-
-	schema := graphql.MustParseSchema(string(s), &Resolver{db: db}, graphql.UseStringDescriptions())
+    db := s.DB
+	schema := graphql.MustParseSchema(string(fileschema), &Resolver{db: db}, graphql.UseStringDescriptions())
 
 	mux := http.NewServeMux()
 

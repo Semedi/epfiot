@@ -65,6 +65,17 @@ func (db *DB) getUserVmIDs(ctx context.Context, userID uint) ([]int, error) {
 	return ids, nil
 }
 
+func (db *DB) GetUserbyName(username string) (int, error) {
+	var user User
+    var id int
+
+	err := db.DB.Where("name = ?", username).Find(&user).Pluck("id", &id).Error
+	if err != nil {
+		return -1, err
+	}
+	return id, nil
+}
+
 func (db *DB) getUser(ctx context.Context, id uint) (*User, error) {
 	var user User
 	err := db.DB.First(&user, id).Error
