@@ -76,7 +76,7 @@ func (db *DB) GetUserbyName(username string) (int, error) {
 	return id, nil
 }
 
-func (db *DB) getUser(ctx context.Context, id uint) (*User, error) {
+func (db *DB) getUser(id uint) (*User, error) {
 	var user User
 	err := db.DB.First(&user, id).Error
 	if err != nil {

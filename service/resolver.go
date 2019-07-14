@@ -21,7 +21,7 @@ func (r *Resolver) GetUser(ctx context.Context, args struct{ ID graphql.ID }) (*
 		return nil, err
 	}
 
-	user, err := r.db.getUser(ctx, id)
+	user, err := r.db.getUser(id)
 	if err != nil {
 		return nil, err
 	}

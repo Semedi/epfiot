@@ -41,7 +41,10 @@ func New() *Server{
     return s
 }
 
-func DashBoardPageHandler(w http.ResponseWriter, r *http.Request) {
+func DashBoardPageHandler() http.Handler {
+
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
+
         conditionsMap := map[string]interface{}{}
         //read from session
         session, err := loggedUserSession.Get(r, "authenticated-user-session")
@@ -59,10 +62,12 @@ func DashBoardPageHandler(w http.ResponseWriter, r *http.Request) {
         if err := dashboardTemplate.Execute(w, conditionsMap); err != nil {
                 log.Println(err)
         }
+    })
 }
 
-func LoginPageHandler(w http.ResponseWriter, r *http.Request) {
+func LoginPageHandler() http.Handler {
 
+    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
         conditionsMap := map[string]interface{}{}
 
         // check if session is active
@@ -113,6 +118,7 @@ func LoginPageHandler(w http.ResponseWriter, r *http.Request) {
         if err := logUserTemplate.Execute(w, conditionsMap); err != nil {
                 log.Println(err)
         }
+    })
 }
 
 func MainHandler(w http.ResponseWriter, r *http.Request) {
@@ -171,8 +177,8 @@ func (s *Server) Run() {
 
 	mux := http.NewServeMux()
 
-	mux.Handle("/", http.HandlerFunc(DashBoardPageHandler))
-	mux.Handle("/login", http.HandlerFunc(LoginPageHandler))
+	mux.Handle("/", DashBoardPageHandler())
+	mux.Handle("/login", LoginPageHandler())
 	mux.Handle("/dashboard", http.HandlerFunc(MainHandler))
 	mux.Handle("/logout", http.HandlerFunc(LogoutHandler))
 	mux.Handle("/query", &relay.Handler{Schema: schema})
