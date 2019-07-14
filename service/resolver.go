@@ -8,14 +8,19 @@ import (
 	"strings"
 
 	graphql "github.com/graph-gophers/graphql-go"
+	"github.com/semedi/epfiot/driver"
 )
 
 type Resolver struct {
 	db *DB
+    drv *driver.Driver
 }
 
 // GetUser resolves the getUser query
 func (r *Resolver) GetUser(ctx context.Context, args struct{ ID graphql.ID }) (*UserResolver, error) {
+
+
+    r.drv.Controller.Init()
 	id, err := gqlIDToUint(args.ID)
 	if err != nil {
 		return nil, err

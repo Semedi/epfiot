@@ -8,9 +8,10 @@ import (
 func main() {
 	driver := new(d.Driver)
 
+    driver.Init()
     server := service.New()
-    server.Run()
 
-	driver.Init()
-	driver.Start()
+    server.Run(driver)
+
+    //driver.Start()
 }

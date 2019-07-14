@@ -13,6 +13,7 @@ import (
     "github.com/gorilla/sessions"
     "golang.org/x/crypto/bcrypt"
     "html/template"
+	"github.com/semedi/epfiot/driver"
 )
 
 var encryptionKey     = "something-very-secret"
@@ -36,7 +37,7 @@ func New() *Server{
 		panic(err)
 	}
 
-    s.DB = db
+    s.DB       = db
 
     return s
 }
@@ -165,7 +166,7 @@ func init() {
     }
 }
 
-func (s *Server) Run() {
+func (s *Server) Run(drv *driver.Driver) {
 	fileschema, err := ioutil.ReadFile("service/schema")
 
 	if err != nil {
@@ -173,7 +174,7 @@ func (s *Server) Run() {
 	}
 
     db := s.DB
-	schema := graphql.MustParseSchema(string(fileschema), &Resolver{db: db}, graphql.UseStringDescriptions())
+    schema := graphql.MustParseSchema(string(fileschema), &Resolver{db: db, drv: drv}, graphql.UseStringDescriptions())
 
 	mux := http.NewServeMux()
 
