@@ -17,7 +17,7 @@ type vmsConnArgs struct {
 // VmsConnection returns nodes (vms) connected by edges (relationships)
 func (u *UserResolver) VmsConnection(ctx context.Context, args vmsConnArgs) (*UserVmsConnectionResolver, error) {
 	// query only the ID fields from the vms otherwise it would be wasteful
-	ids, err := u.db.getUserVmIDs(ctx, u.m.ID)
+	ids, err := u.db.getUserVmIDs(u.m.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func (u UserVmsConnectionResolver) TotalCount(ctx context.Context) int32 {
 func (u *UserVmsConnectionResolver) Edges(ctx context.Context) (*[]*UserVmEdge, error) {
 	// query goes here because I know all of the ids that are needed. If I queried in the
 	// UserVmEdge resolver method, it would run multiple single queries
-	vms, err := u.db.getVmsByID(ctx, u.ids, u.from, u.to)
+	vms, err := u.db.getVmsByID(u.ids, u.from, u.to)
 	if err != nil {
 		return nil, err
 	}

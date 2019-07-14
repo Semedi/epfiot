@@ -35,7 +35,7 @@ func (r *Resolver) GetUser(ctx context.Context, args struct{ ID graphql.ID }) (*
 }
 
 func (r *Resolver) GetUsers(ctx context.Context) (*[]*UserResolver, error) {
-	users, err := r.db.getUsers(ctx)
+	users, err := r.db.getUsers()
 	if err != nil {
 		return nil, err
 	}
@@ -52,13 +52,13 @@ func (r *Resolver) GetUsers(ctx context.Context) (*[]*UserResolver, error) {
 }
 
 // GetVm resolves the getVm query
-func (r *Resolver) GetVm(ctx context.Context, args struct{ ID graphql.ID }) (*VmResolver, error) {
+func (r *Resolver) GetVm(args struct{ ID graphql.ID }) (*VmResolver, error) {
 	id, err := gqlIDToUint(args.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	vm, err := r.db.getVm(ctx, id)
+	vm, err := r.db.getVm(id)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +73,7 @@ func (r *Resolver) GetVm(ctx context.Context, args struct{ ID graphql.ID }) (*Vm
 
 // GetTag resolves the getTag query
 func (r *Resolver) GetTag(ctx context.Context, args struct{ Title string }) (*TagResolver, error) {
-	tag, err := r.db.getTagBytTitle(ctx, args.Title)
+	tag, err := r.db.getTagBytTitle(args.Title)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ type vmInput struct {
 
 // AddVm Resolves the addVm mutation
 func (r *Resolver) AddVm(ctx context.Context, args struct{ Vm vmInput }) (*VmResolver, error) {
-	vm, err := r.db.addVm(ctx, args.Vm)
+	vm, err := r.db.addVm(args.Vm)
 	if err != nil {
 		return nil, err
 	}
@@ -110,8 +110,8 @@ func (r *Resolver) AddVm(ctx context.Context, args struct{ Vm vmInput }) (*VmRes
 }
 
 // UpdateVm takes care of updating any field on the vm
-func (r *Resolver) UpdateVm(ctx context.Context, args struct{ Vm vmInput }) (*VmResolver, error) {
-	vm, err := r.db.updateVm(ctx, &args.Vm)
+func (r *Resolver) UpdateVm(args struct{ Vm vmInput }) (*VmResolver, error) {
+	vm, err := r.db.updateVm(&args.Vm)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +125,7 @@ func (r *Resolver) UpdateVm(ctx context.Context, args struct{ Vm vmInput }) (*Vm
 }
 
 // DeleteVm takes care of deleting a vm record
-func (r *Resolver) DeleteVm(ctx context.Context, args struct{ UserID, VmID graphql.ID }) (*bool, error) {
+func (r *Resolver) DeleteVm(args struct{ UserID, VmID graphql.ID }) (*bool, error) {
 	vmID, err := gqlIDToUint(args.VmID)
 	if err != nil {
 		return nil, err
@@ -136,7 +136,7 @@ func (r *Resolver) DeleteVm(ctx context.Context, args struct{ UserID, VmID graph
 		return nil, err
 	}
 
-	return r.db.deleteVm(ctx, userID, vmID)
+	return r.db.deleteVm(userID, vmID)
 }
 
 // encode cursor encodes the cursot position in base64

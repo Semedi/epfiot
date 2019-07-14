@@ -32,7 +32,7 @@ func (t *TagResolver) Title(ctx context.Context) *string {
 
 // Vms resolves the vmsvnoremap field
 func (t *TagResolver) Vms(ctx context.Context) (*[]*VmResolver, error) {
-	vms, err := t.db.getTagVms(ctx, &t.m)
+	vms, err := t.db.getTagVms(&t.m)
 	if err != nil {
 		return nil, err
 	}

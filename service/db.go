@@ -1,7 +1,6 @@
 package service
 
 import (
-	"context"
 	"math/rand"
 
 	"github.com/jinzhu/gorm"
@@ -56,7 +55,7 @@ func newDB(path string) (*DB, error) {
 // USERS:
 // ###########################################################
 
-func (db *DB) getUserVmIDs(ctx context.Context, userID uint) ([]int, error) {
+func (db *DB) getUserVmIDs(userID uint) ([]int, error) {
 	var ids []int
 	err := db.DB.Where("owner_id = ?", userID).Find(&[]Vm{}).Pluck("id", &ids).Error
 	if err != nil {
@@ -86,7 +85,7 @@ func (db *DB) getUser(id uint) (*User, error) {
 	return &user, nil
 }
 
-func (db *DB) getUsers(ctx context.Context) ([]User, error) {
+func (db *DB) getUsers() ([]User, error) {
 	var users []User
 	err := db.DB.Find(&users).Error
 	if err != nil {
@@ -97,7 +96,7 @@ func (db *DB) getUsers(ctx context.Context) ([]User, error) {
 }
 
 // GetUserVms gets vms associated with the user
-func (db *DB) GetUserVms(ctx context.Context, id uint) ([]Vm, error) {
+func (db *DB) GetUserVms(id uint) ([]Vm, error) {
 	var u User
 	u.ID = id
 
@@ -114,8 +113,8 @@ func (db *DB) GetUserVms(ctx context.Context, id uint) ([]Vm, error) {
 // VMS:
 // ###########################################################
 
-// GetVm should authorize the user in ctx and return a vm or error
-func (db *DB) getVm(ctx context.Context, id uint) (*Vm, error) {
+// GetVm should authorize the user and  return a vm or error
+func (db *DB) getVm(id uint) (*Vm, error) {
 	var p Vm
 	err := db.DB.First(&p, id).Error
 	if err != nil {
@@ -125,7 +124,7 @@ func (db *DB) getVm(ctx context.Context, id uint) (*Vm, error) {
 	return &p, nil
 }
 
-func (db *DB) getVmOwner(ctx context.Context, id int32) (*User, error) {
+func (db *DB) getVmOwner(id int32) (*User, error) {
 	var u User
 	err := db.DB.First(&u, id).Error
 	if err != nil {
@@ -134,7 +133,7 @@ func (db *DB) getVmOwner(ctx context.Context, id int32) (*User, error) {
 	return &u, nil
 }
 
-func (db *DB) getVmTags(ctx context.Context, p *Vm) ([]Tag, error) {
+func (db *DB) getVmTags(p *Vm) ([]Tag, error) {
 	var t []Tag
 	err := db.DB.Model(p).Related(&t, "Tags").Error
 	if err != nil {
@@ -144,7 +143,7 @@ func (db *DB) getVmTags(ctx context.Context, p *Vm) ([]Tag, error) {
 	return t, nil
 }
 
-func (db *DB) getVmsByID(ctx context.Context, ids []int, from, to int) ([]Vm, error) {
+func (db *DB) getVmsByID(ids []int, from, to int) ([]Vm, error) {
 	var p []Vm
 	err := db.DB.Where("id in (?)", ids[from:to]).Find(&p).Error
 	if err != nil {
@@ -153,7 +152,7 @@ func (db *DB) getVmsByID(ctx context.Context, ids []int, from, to int) ([]Vm, er
 	return p, nil
 }
 
-func (db *DB) updateVm(ctx context.Context, args *vmInput) (*Vm, error) {
+func (db *DB) updateVm(args *vmInput) (*Vm, error) {
 	// get the vm to be updated from the db
 	var p Vm
 	err := db.DB.First(&p, args.ID).Error
@@ -199,7 +198,7 @@ func (db *DB) updateVm(ctx context.Context, args *vmInput) (*Vm, error) {
 	return &p, nil
 }
 
-func (db *DB) deleteVm(ctx context.Context, userID, VmID uint) (*bool, error) {
+func (db *DB) deleteVm(userID, VmID uint) (*bool, error) {
 	// make sure the record exist
 	var p Vm
 	err := db.DB.First(&p, VmID).Error
@@ -222,7 +221,7 @@ func (db *DB) deleteVm(ctx context.Context, userID, VmID uint) (*bool, error) {
 	return boolP(true), err
 }
 
-func (db *DB) addVm(ctx context.Context, input vmInput) (*Vm, error) {
+func (db *DB) addVm(input vmInput) (*Vm, error) {
 	// get the M2M relation tags from the DB and put them in the vm to be saved
 	var t []Tag
 	err := db.DB.Where("id in (?)", input.TagIDs).Find(&t).Error
@@ -247,7 +246,7 @@ func (db *DB) addVm(ctx context.Context, input vmInput) (*Vm, error) {
 // ###########################################################
 // TAGS:
 // ###########################################################
-func (db *DB) getTagVms(ctx context.Context, t *Tag) ([]Vm, error) {
+func (db *DB) getTagVms(t *Tag) ([]Vm, error) {
 	var p []Vm
 	err := db.DB.Model(t).Related(&p, "Vms").Error
 	if err != nil {
@@ -257,7 +256,7 @@ func (db *DB) getTagVms(ctx context.Context, t *Tag) ([]Vm, error) {
 	return p, nil
 }
 
-func (db *DB) getTagBytTitle(ctx context.Context, title string) (*Tag, error) {
+func (db *DB) getTagBytTitle(title string) (*Tag, error) {
 	var t Tag
 	err := db.DB.Where("title = ?", title).First(&t).Error
 	if err != nil {

@@ -27,8 +27,8 @@ func (p *VmResolver) ID(ctx context.Context) *graphql.ID {
 }
 
 // Owner resolves the owner field for Vm
-func (p *VmResolver) Owner(ctx context.Context) (*UserResolver, error) {
-	user, err := p.db.getVmOwner(ctx, int32(p.m.OwnerID))
+func (p *VmResolver) Owner() (*UserResolver, error) {
+	user, err := p.db.getVmOwner(int32(p.m.OwnerID))
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (p *VmResolver) Name(ctx context.Context) *string {
 
 // Tags resolves the vm tags
 func (p *VmResolver) Tags(ctx context.Context) (*[]*TagResolver, error) {
-	tags, err := p.db.getVmTags(ctx, &p.m)
+	tags, err := p.db.getVmTags(&p.m)
 	if err != nil {
 		return nil, err
 	}

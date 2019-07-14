@@ -32,7 +32,7 @@ func (u *UserResolver) Name(ctx context.Context) *string {
 
 // Vms resolves the Vms field for User
 func (u *UserResolver) Vms(ctx context.Context) (*[]*VmResolver, error) {
-	vms, err := u.db.GetUserVms(ctx, u.m.ID)
+	vms, err := u.db.GetUserVms(u.m.ID)
 	if err != nil {
 		return nil, err
 	}
