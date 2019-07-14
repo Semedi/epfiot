@@ -10,14 +10,12 @@ import (
 	graphql "github.com/graph-gophers/graphql-go"
 	"github.com/graph-gophers/graphql-go/relay"
 
-    "github.com/gorilla/sessions"
     "golang.org/x/crypto/bcrypt"
     "html/template"
 	"github.com/semedi/epfiot/driver"
+	"github.com/semedi/epfiot/service/auth"
 )
 
-var encryptionKey     = "something-very-secret"
-var loggedUserSession = sessions.NewCookieStore([]byte(encryptionKey))
 
 // from const.go:
 var dashboardTemplate = template.Must(template.New("").Parse(dashBoardPage))
@@ -47,6 +45,9 @@ func DashBoardPageHandler() http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
 
         conditionsMap := map[string]interface{}{}
+
+
+        username = auth.Current()
         //read from session
         session, err := loggedUserSession.Get(r, "authenticated-user-session")
 
@@ -72,10 +73,10 @@ func LoginPageHandler() http.Handler {
         conditionsMap := map[string]interface{}{}
 
         // check if session is active
-        session, _ := loggedUserSession.Get(r, "authenticated-user-session")
+        islogged, user := auth.Current()
 
-        if session != nil {
-                conditionsMap["Username"] = session.Values["username"]
+        if islogged == true {
+            conditionsMap["Username"] = user
         }
 
         // verify username and password
@@ -101,15 +102,7 @@ func LoginPageHandler() http.Handler {
                         conditionsMap["Username"] = username
                         conditionsMap["LoginError"] = false
 
-                        // create a new session and redirect to dashboard
-                        session, _ := loggedUserSession.New(r, "authenticated-user-session")
-
-                        session.Values["username"] = username
-                        err := session.Save(r, w)
-
-                        if err != nil {
-                                log.Println(err)
-                        }
+                        auth.Authenticate(username, r)
 
                         http.Redirect(w, r, "/dashboard", http.StatusFound)
                 }
@@ -152,18 +145,6 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
         }
 
         w.Write([]byte("Logged out!"))
-}
-
-
-func init() {
-    loggedUserSession.Options = &sessions.Options{
-         // change domain to match your machine. Can be localhost
-         // IF the Domain name doesn't match, your session will be EMPTY!
-         Domain:   "localhost",
-         Path:     "/",
-         MaxAge:   3600 * 3, // 3 hours
-         HttpOnly: true,
-    }
 }
 
 func (s *Server) Run(drv *driver.Driver) {
