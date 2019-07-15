@@ -1,4 +1,4 @@
-package service
+package model
 
 import (
 	"math/rand"
@@ -13,7 +13,7 @@ type DB struct {
 }
 
 // NewDB returns a new DB connection
-func newDB(path string) (*DB, error) {
+func NewDB(path string) (*DB, error) {
 	// connect to the example db, create if it doesn't exist
 	db, err := gorm.Open("sqlite3", path)
 	if err != nil {

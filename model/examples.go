@@ -1,4 +1,4 @@
-package service
+package model
 
 // TEST DATA TO BE PUT INTO THE DB
 var users = []User{

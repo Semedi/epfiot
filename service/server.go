@@ -13,7 +13,7 @@ import (
     "golang.org/x/crypto/bcrypt"
     "html/template"
 	"github.com/semedi/epfiot/driver"
-	"github.com/semedi/epfiot/service/auth"
+	"github.com/semedi/epfiot/model"
 )
 
 
@@ -24,18 +24,18 @@ var mainTemplate      = template.Must(template.New("").Parse(mainPage))
 
 
 type Server struct{
-    *DB
+    db *model.DB
 }
 
 func New() *Server{
     s := new(Server)
 
-	db, err := newDB("./db.sqlite")
+	database, err := model.NewDB("./db.sqlite")
 	if err != nil {
 		panic(err)
 	}
 
-    s.DB       = db
+    s.db = database
 
     return s
 }
@@ -47,7 +47,7 @@ func DashBoardPageHandler() http.Handler {
         conditionsMap := map[string]interface{}{}
 
 
-        islogged, user := auth.Current(r)
+        islogged, user := Current(r)
         if islogged == true {
             log.Println("Username : ", user)
             conditionsMap["Username"] = user
@@ -65,7 +65,7 @@ func LoginPageHandler() http.Handler {
         conditionsMap := map[string]interface{}{}
 
         // check if session is active
-        islogged, user := auth.Current(r)
+        islogged, user := Current(r)
 
         if islogged == true {
             conditionsMap["Username"] = user
@@ -94,7 +94,7 @@ func LoginPageHandler() http.Handler {
                         conditionsMap["Username"] = username
                         conditionsMap["LoginError"] = false
 
-                        auth.Authenticate(username, w, r)
+                        Authenticate(username, w, r)
 
                         http.Redirect(w, r, "/dashboard", http.StatusFound)
                 }
@@ -111,7 +111,7 @@ func MainHandler(w http.ResponseWriter, r *http.Request) {
         conditionsMap := map[string]interface{}{}
 
         //read from session
-        islogged, user := auth.Current(r)
+        islogged, user := Current(r)
 
         if islogged == true {
             log.Println("Username : ", user)
@@ -125,20 +125,21 @@ func MainHandler(w http.ResponseWriter, r *http.Request) {
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 
-        auth.Close(w, r)
+        Close(w, r)
 
         w.Write([]byte("Logged out!"))
 }
 
 func (s *Server) Run(drv *driver.Driver) {
-	fileschema, err := ioutil.ReadFile("service/schema")
+	fileschema, err := ioutil.ReadFile("model/schema")
 
 	if err != nil {
 		log.Fatalf("failed read schema")
 	}
 
-    db := s.DB
-    schema := graphql.MustParseSchema(string(fileschema), &Resolver{db: db, drv: drv}, graphql.UseStringDescriptions())
+    database := s.db
+
+    schema := graphql.MustParseSchema(string(fileschema), &model.Resolver{Db: database, Drv: drv}, graphql.UseStringDescriptions())
 
 	mux := http.NewServeMux()
 

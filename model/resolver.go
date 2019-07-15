@@ -1,4 +1,4 @@
-package service
+package model
 
 import (
 	"context"
@@ -12,27 +12,27 @@ import (
 )
 
 type Resolver struct {
-	db *DB
-    drv *driver.Driver
+	Db *DB
+    Drv *driver.Driver
 }
 
 // GetUser resolves the getUser query
 func (r *Resolver) GetUser(ctx context.Context, args struct{ ID graphql.ID }) (*UserResolver, error) {
 
 
-    r.drv.Controller.Init()
+    r.Drv.Controller.Init()
 	id, err := gqlIDToUint(args.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	user, err := r.db.getUser(id)
+	user, err := r.Db.getUser(id)
 	if err != nil {
 		return nil, err
 	}
 
 	s := UserResolver{
-		db: r.db,
+		db: r.Db,
 		m:  *user,
 	}
 
@@ -40,7 +40,7 @@ func (r *Resolver) GetUser(ctx context.Context, args struct{ ID graphql.ID }) (*
 }
 
 func (r *Resolver) GetUsers(ctx context.Context) (*[]*UserResolver, error) {
-	users, err := r.db.getUsers()
+	users, err := r.Db.getUsers()
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (r *Resolver) GetUsers(ctx context.Context) (*[]*UserResolver, error) {
 	u := make([]*UserResolver, len(users))
 	for i := range users {
 		u[i] = &UserResolver{
-			db: r.db,
+			db: r.Db,
 			m:  users[i],
 		}
 	}
@@ -63,13 +63,13 @@ func (r *Resolver) GetVm(args struct{ ID graphql.ID }) (*VmResolver, error) {
 		return nil, err
 	}
 
-	vm, err := r.db.getVm(id)
+	vm, err := r.Db.getVm(id)
 	if err != nil {
 		return nil, err
 	}
 
 	s := VmResolver{
-		db: r.db,
+		db: r.Db,
 		m:  *vm,
 	}
 
@@ -78,13 +78,13 @@ func (r *Resolver) GetVm(args struct{ ID graphql.ID }) (*VmResolver, error) {
 
 // GetTag resolves the getTag query
 func (r *Resolver) GetTag(ctx context.Context, args struct{ Title string }) (*TagResolver, error) {
-	tag, err := r.db.getTagBytTitle(args.Title)
+	tag, err := r.Db.getTagBytTitle(args.Title)
 	if err != nil {
 		return nil, err
 	}
 
 	s := TagResolver{
-		db: r.db,
+		db: r.Db,
 		m:  *tag,
 	}
 
@@ -101,13 +101,13 @@ type vmInput struct {
 
 // AddVm Resolves the addVm mutation
 func (r *Resolver) AddVm(ctx context.Context, args struct{ Vm vmInput }) (*VmResolver, error) {
-	vm, err := r.db.addVm(args.Vm)
+	vm, err := r.Db.addVm(args.Vm)
 	if err != nil {
 		return nil, err
 	}
 
 	s := VmResolver{
-		db: r.db,
+		db: r.Db,
 		m:  *vm,
 	}
 
@@ -116,13 +116,13 @@ func (r *Resolver) AddVm(ctx context.Context, args struct{ Vm vmInput }) (*VmRes
 
 // UpdateVm takes care of updating any field on the vm
 func (r *Resolver) UpdateVm(args struct{ Vm vmInput }) (*VmResolver, error) {
-	vm, err := r.db.updateVm(&args.Vm)
+	vm, err := r.Db.updateVm(&args.Vm)
 	if err != nil {
 		return nil, err
 	}
 
 	s := VmResolver{
-		db: r.db,
+		db: r.Db,
 		m:  *vm,
 	}
 
@@ -141,7 +141,7 @@ func (r *Resolver) DeleteVm(args struct{ UserID, VmID graphql.ID }) (*bool, erro
 		return nil, err
 	}
 
-	return r.db.deleteVm(userID, vmID)
+	return r.Db.deleteVm(userID, vmID)
 }
 
 // encode cursor encodes the cursot position in base64
