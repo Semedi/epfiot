@@ -3,14 +3,13 @@ package auth
 import (
     "github.com/gorilla/sessions"
 	"net/http"
+	log "github.com/sirupsen/logrus"
+    "fmt"
 )
 
 var encryptionKey     = "something-very-secret"
 var loggedUserSession = sessions.NewCookieStore([]byte(encryptionKey))
 
-
-func p() {
-}
 
 func init() {
     loggedUserSession.Options = &sessions.Options{
@@ -23,7 +22,7 @@ func init() {
     }
 }
 
-func Authenticate(username string, r *http.Request) {
+func Authenticate(username string, w http.ResponseWriter, r *http.Request) {
     session, _ := loggedUserSession.New(r, "authenticated-user-session")
 
     session.Values["username"] = username
@@ -34,7 +33,20 @@ func Authenticate(username string, r *http.Request) {
     }
 }
 
-func Current() (bool, string) {
+func Close(w http.ResponseWriter, r *http.Request) {
+    //read from session
+    session, _ := loggedUserSession.Get(r, "authenticated-user-session")
+
+    // remove the username
+    session.Values["username"] = ""
+    err := session.Save(r, w)
+
+    if err != nil {
+            log.Println(err)
+    }
+}
+
+func Current(r *http.Request) (bool, string) {
     session, err := loggedUserSession.Get(r, "authenticated-user-session")
     user := ""
     success := false
@@ -44,8 +56,9 @@ func Current() (bool, string) {
     }
 
     if session != nil {
-        user = session.Values["username"]
+        user = fmt.Sprintf("%v", session.Values["username"])
         success = true
+
     }
 
    return success, user

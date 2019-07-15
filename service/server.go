@@ -47,19 +47,11 @@ func DashBoardPageHandler() http.Handler {
         conditionsMap := map[string]interface{}{}
 
 
-        username = auth.Current()
-        //read from session
-        session, err := loggedUserSession.Get(r, "authenticated-user-session")
-
-        if err != nil {
-                log.Println("Unable to retrieve session data!", err)
+        islogged, user := auth.Current(r)
+        if islogged == true {
+            log.Println("Username : ", user)
+            conditionsMap["Username"] = user
         }
-
-        log.Println("Session name : ", session.Name())
-
-        log.Println("Username : ", session.Values["username"])
-
-        conditionsMap["Username"] = session.Values["username"]
 
         if err := dashboardTemplate.Execute(w, conditionsMap); err != nil {
                 log.Println(err)
@@ -73,7 +65,7 @@ func LoginPageHandler() http.Handler {
         conditionsMap := map[string]interface{}{}
 
         // check if session is active
-        islogged, user := auth.Current()
+        islogged, user := auth.Current(r)
 
         if islogged == true {
             conditionsMap["Username"] = user
@@ -102,7 +94,7 @@ func LoginPageHandler() http.Handler {
                         conditionsMap["Username"] = username
                         conditionsMap["LoginError"] = false
 
-                        auth.Authenticate(username, r)
+                        auth.Authenticate(username, w, r)
 
                         http.Redirect(w, r, "/dashboard", http.StatusFound)
                 }
@@ -119,13 +111,12 @@ func MainHandler(w http.ResponseWriter, r *http.Request) {
         conditionsMap := map[string]interface{}{}
 
         //read from session
-        session, err := loggedUserSession.Get(r, "authenticated-user-session")
+        islogged, user := auth.Current(r)
 
-        if err != nil {
-                log.Println("Unable to retrieve session data!", err)
+        if islogged == true {
+            log.Println("Username : ", user)
+            conditionsMap["Username"] = user
         }
-
-        conditionsMap["Username"] = session.Values["username"]
 
         if err := mainTemplate.Execute(w, conditionsMap); err != nil {
                 log.Println(err)
@@ -133,16 +124,8 @@ func MainHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
-        //read from session
-        session, _ := loggedUserSession.Get(r, "authenticated-user-session")
 
-        // remove the username
-        session.Values["username"] = ""
-        err := session.Save(r, w)
-
-        if err != nil {
-                log.Println(err)
-        }
+        auth.Close(w, r)
 
         w.Write([]byte("Logged out!"))
 }
@@ -184,5 +167,3 @@ func logged(next http.Handler) http.Handler {
 		}).Info()
 	})
 }
-
-
