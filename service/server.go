@@ -141,8 +141,8 @@ func (s *Server) Run(drv *driver.Driver) {
 		log.Fatalf("failed read schema")
 	}
 
-    database := s.db
-    r        := &model.Resolver{Db: database, Drv: drv}
+    database       := s.db
+    r              := &model.Resolver{Db: database, Drv: drv}
 
     schema := graphql.MustParseSchema(string(fileschema), r, graphql.UseStringDescriptions())
 

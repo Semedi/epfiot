@@ -18,7 +18,7 @@ const (
 )
 
 var Current_mode Mode;
-var Current_user string;
+var Current_user User;
 
 type Resolver struct {
 	Db *DB
@@ -34,8 +34,7 @@ func (r *Resolver)Set_mode(m Mode, name string) (int){
     }
 
     Current_mode = m
-    Current_user = name
-
+    Current_user = *u
 
     return 0
 }
@@ -64,7 +63,8 @@ func (r *Resolver) GetUser(ctx context.Context, args struct{ ID graphql.ID }) (*
 }
 
 func (r *Resolver) GetVms(ctx context.Context) (*[]*VmResolver, error) {
-	vms, err := r.Db.getVms()
+
+    vms, err := r.Db.GetUserVms(Current_user.ID)
 	if err != nil {
 		return nil, err
 	}

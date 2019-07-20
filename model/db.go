@@ -89,17 +89,6 @@ func (db *DB) getUser(id uint) (*User, error) {
 	return &user, nil
 }
 
-func (db *DB) getVms() ([]Vm, error) {
-	var vms []Vm
-	err := db.DB.Find(&vms).Error
-	if err != nil {
-		return nil, err
-	}
-
-	return vms, nil
-}
-
-
 func (db *DB) getUsers() ([]User, error) {
 	var users []User
 	err := db.DB.Find(&users).Error
