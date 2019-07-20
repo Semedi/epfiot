@@ -48,7 +48,7 @@ func Close(w http.ResponseWriter, r *http.Request) {
 
 func Current(r *http.Request) (bool, string) {
     session, err := loggedUserSession.Get(r, "authenticated-user-session")
-    user := ""
+    logged_user := ""
     success := false
 
     if err != nil {
@@ -56,10 +56,9 @@ func Current(r *http.Request) (bool, string) {
     }
 
     if session != nil {
-        user = fmt.Sprintf("%v", session.Values["username"])
-        success = true
-
+        logged_user    = fmt.Sprintf("%v", session.Values["username"])
+        success        = logged_user != "<nil>"
     }
 
-   return success, user
+   return success, logged_user
 }

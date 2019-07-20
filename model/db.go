@@ -64,15 +64,19 @@ func (db *DB) getUserVmIDs(userID uint) ([]int, error) {
 	return ids, nil
 }
 
-func (db *DB) GetUserbyName(username string) (int, error) {
+func (db *DB) find_user(username string) (*User, error) {
 	var user User
-    var id int
 
-	err := db.DB.Where("name = ?", username).Find(&user).Pluck("id", &id).Error
+	err := db.DB.First(&user, "name = ?", username).Error
 	if err != nil {
-		return -1, err
+		return nil, err
 	}
-	return id, nil
+
+    if user.Name == "" {
+        return nil, nil
+    }
+
+	return &user, nil
 }
 
 func (db *DB) getUser(id uint) (*User, error) {
@@ -84,6 +88,17 @@ func (db *DB) getUser(id uint) (*User, error) {
 
 	return &user, nil
 }
+
+func (db *DB) getVms() ([]Vm, error) {
+	var vms []Vm
+	err := db.DB.Find(&vms).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return vms, nil
+}
+
 
 func (db *DB) getUsers() ([]User, error) {
 	var users []User

@@ -11,14 +11,38 @@ import (
 	"github.com/semedi/epfiot/driver"
 )
 
+type Mode int
+const (
+    Admin  Mode = 0
+    Client Mode = 1
+)
+
+var Current_mode Mode;
+var Current_user string;
+
 type Resolver struct {
 	Db *DB
     Drv *driver.Driver
 }
 
+
+func (r *Resolver)Set_mode(m Mode, name string) (int){
+    u, err := r.Db.find_user(name)
+
+    if err != nil || u == nil {
+        return -1
+    }
+
+    Current_mode = m
+    Current_user = name
+
+
+    return 0
+}
+
+
 // GetUser resolves the getUser query
 func (r *Resolver) GetUser(ctx context.Context, args struct{ ID graphql.ID }) (*UserResolver, error) {
-
 
     r.Drv.Controller.Init()
 	id, err := gqlIDToUint(args.ID)
@@ -37,6 +61,23 @@ func (r *Resolver) GetUser(ctx context.Context, args struct{ ID graphql.ID }) (*
 	}
 
 	return &s, nil
+}
+
+func (r *Resolver) GetVms(ctx context.Context) (*[]*VmResolver, error) {
+	vms, err := r.Db.getVms()
+	if err != nil {
+		return nil, err
+	}
+
+	v := make([]*VmResolver, len(vms))
+	for i := range vms {
+		v[i] = &VmResolver{
+			db: r.Db,
+			m:  vms[i],
+		}
+	}
+
+	return &v, nil
 }
 
 func (r *Resolver) GetUsers(ctx context.Context) (*[]*UserResolver, error) {

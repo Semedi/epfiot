@@ -9,6 +9,7 @@ type Query {
   getUsers(): [User]
   getVm(id: ID!): Vm
   getTag(title: String!): Tag
+  getVms(): [Vm]
 }
 
 "The mutation type, represents all updates we can make to our data"

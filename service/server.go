@@ -59,16 +59,18 @@ func DashBoardPageHandler() http.Handler {
     })
 }
 
-func LoginPageHandler() http.Handler {
+func LoginPageHandler(res *model.Resolver) http.Handler {
 
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
         conditionsMap := map[string]interface{}{}
 
         // check if session is active
         islogged, user := Current(r)
+        log.Println("mierdaaaaa")
 
         if islogged == true {
             conditionsMap["Username"] = user
+            log.Println("entro en logeado")
         }
 
         // verify username and password
@@ -94,7 +96,9 @@ func LoginPageHandler() http.Handler {
                         conditionsMap["Username"] = username
                         conditionsMap["LoginError"] = false
 
-                        Authenticate(username, w, r)
+                        err := res.Set_mode(0, username)
+
+                        if err == 0 { Authenticate(username, w, r) }
 
                         http.Redirect(w, r, "/dashboard", http.StatusFound)
                 }
@@ -138,15 +142,17 @@ func (s *Server) Run(drv *driver.Driver) {
 	}
 
     database := s.db
+    r        := &model.Resolver{Db: database, Drv: drv}
 
-    schema := graphql.MustParseSchema(string(fileschema), &model.Resolver{Db: database, Drv: drv}, graphql.UseStringDescriptions())
+    schema := graphql.MustParseSchema(string(fileschema), r, graphql.UseStringDescriptions())
 
 	mux := http.NewServeMux()
 
 	mux.Handle("/", DashBoardPageHandler())
-	mux.Handle("/login", LoginPageHandler())
+	mux.Handle("/login", LoginPageHandler(r))
 	mux.Handle("/dashboard", http.HandlerFunc(MainHandler))
 	mux.Handle("/logout", http.HandlerFunc(LogoutHandler))
+
 	mux.Handle("/query", &relay.Handler{Schema: schema})
 
 	log.WithFields(log.Fields{"time": time.Now()}).Info("starting server")
