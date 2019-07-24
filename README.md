@@ -13,11 +13,15 @@ Edge Provisioning for Internet of Things
         * alpine-sdk
         * libvirt-dev # including headers and pkgfile
         * libvirt-qemu
+        * cdrkit (genisoimage)
         * go
             - epfiot (this repo)
             - libvirt-go
             - libvirt-go-xml
 
+
+tocheck: libguestFS
 ### Author
 
 Sergio Semedi (UCM IoT Master's Degree)
+

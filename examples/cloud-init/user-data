@@ -1,0 +1,11 @@
+#cloud-config
+package_upgrade: true
+users:
+  - name: semedi
+    groups: wheel
+    lock_passwd: false
+    passwd: $1$JkeGf1PI$wCShm9AYRxWnFxs9b/mJO0
+    shell: /bin/bash
+    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+    ssh-authorized-keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDHJJAIhGwzdIXKeZpYsWt1Vyd5BquTvJa1lYN4T28I9mI9g03kuPeTyWdMg+AVQeGxvJsWhtdb5reQ67TS+XWuNmBWoxO5CAgz4WZQ7syG66+o0GKGDsHwUV5Xswt4EkLRexc1Ec2cXhiedJtuf/OksysiIHEFg3fvQX7/PPPGRtGb9gZD3KlrCeHhbv+AJa1sZ4Y9DmkyaFMZwSvv+aDYJKxjzNc2PEHmCrPEnyc/id7li21Mfr1wTcuAkdMTiy6FRDMeJb6KJftgJR6AT2DuJ9Wa2+UHwwE37sz1CJra9BIKyjzYDCsSaWy0RxMB0Bn8Z3vUjyzTcNbDpBCYJhfKX2Cl/d06ChlYbULZA2h6Qo+f4TlPJXP6DaeBPEaUMWViIJ2LiGrG7eRvUDP5ww7VPmIp9vnOkdwoxKs7jEtHbULy0jIR38+lFzMqnSFRl6yuppGgUYWF7BjauNHpSp/1EQdxMUHORQUpiOW2YpXWO7pfO+jhJFf5Q5U3+VxcLZhAi7APZf5ziDLEIxePw8JYertuAZp2Rzs86m2/zd+oYskofAQrNemP5Kp9DANpx108DOkfcA3xNTMwlCZBWyoP0xN6EwEn4ry4DzPQvKJEZnJw0PlJ4ghJO1ovIP56TDq86hfwP/Qa0HzaMk1Fs3eTriAY7/wcCjswnFgN5V7HDw==
