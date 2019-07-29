@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -10,128 +11,126 @@ import (
 	graphql "github.com/graph-gophers/graphql-go"
 	"github.com/graph-gophers/graphql-go/relay"
 
-    "golang.org/x/crypto/bcrypt"
-    "html/template"
 	"github.com/semedi/epfiot/driver"
 	"github.com/semedi/epfiot/model"
+	"golang.org/x/crypto/bcrypt"
+	"html/template"
 )
-
 
 // from const.go:
 var dashboardTemplate = template.Must(template.New("").Parse(dashBoardPage))
-var logUserTemplate   = template.Must(template.New("").Parse(logUserPage))
-var mainTemplate      = template.Must(template.New("").Parse(mainPage))
+var logUserTemplate = template.Must(template.New("").Parse(logUserPage))
+var mainTemplate = template.Must(template.New("").Parse(mainPage))
 
-
-type Server struct{
-    db *model.DB
+type Server struct {
+	db *model.DB
 }
 
-func New() *Server{
-    s := new(Server)
+func New() *Server {
+	s := new(Server)
 
 	database, err := model.NewDB("./db.sqlite")
 	if err != nil {
 		panic(err)
 	}
 
-    s.db = database
+	s.db = database
 
-    return s
+	return s
 }
 
 func DashBoardPageHandler() http.Handler {
 
-    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-        conditionsMap := map[string]interface{}{}
+		conditionsMap := map[string]interface{}{}
 
+		islogged, user := Current(r)
 
-        islogged, user := Current(r)
-        if islogged == true {
-            log.Println("Username : ", user)
-            conditionsMap["Username"] = user
-        }
+		if islogged == true {
+			log.Println("Username : ", user)
+			conditionsMap["Username"] = user
+		}
 
-        if err := dashboardTemplate.Execute(w, conditionsMap); err != nil {
-                log.Println(err)
-        }
-    })
+		if err := dashboardTemplate.Execute(w, conditionsMap); err != nil {
+			log.Println(err)
+		}
+	})
 }
 
 func LoginPageHandler(res *model.Resolver) http.Handler {
 
-    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
-        conditionsMap := map[string]interface{}{}
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		conditionsMap := map[string]interface{}{}
 
-        // check if session is active
-        islogged, user := Current(r)
-        log.Println("mierdaaaaa")
+		// check if session is active
+		islogged, user := Current(r)
+		log.Println("mierdaaaaa")
 
-        if islogged == true {
-            conditionsMap["Username"] = user
-            log.Println("entro en logeado")
-        }
+		if islogged == true {
+			conditionsMap["Username"] = user
+			log.Println("entro en logeado")
+		}
 
-        // verify username and password
-        if r.FormValue("Login") != "" && r.FormValue("Username") != "" {
-                username := r.FormValue("Username")
-                password := r.FormValue("Password")
+		// verify username and password
+		if r.FormValue("Login") != "" && r.FormValue("Username") != "" {
+			username := r.FormValue("Username")
+			password := r.FormValue("Password")
 
-                // NOTE: here is where you want to query your database to retrieve the hashed password
-                // for username.
-                // For this tutorial and simplicity sake, we will simulate the retrieved hashed password
-                // as $2a$10$4Yhs5bfGgp4vz7j6ScujKuhpRTA4l4OWg7oSukRbyRN7dc.C1pamu
-                // the plain password is 'mynakedpassword'
-                // see https://www.socketloop.com/tutorials/golang-bcrypting-password for more details
-                // on how to generate bcrypted password
+			// NOTE: here is where you want to query your database to retrieve the hashed password
+			// for username.
+			// For this tutorial and simplicity sake, we will simulate the retrieved hashed password
+			// as $2a$10$4Yhs5bfGgp4vz7j6ScujKuhpRTA4l4OWg7oSukRbyRN7dc.C1pamu
+			// the plain password is 'mynakedpassword'
+			// see https://www.socketloop.com/tutorials/golang-bcrypting-password for more details
+			// on how to generate bcrypted password
 
-                hashedPasswordFromDatabase := []byte("$2a$10$4Yhs5bfGgp4vz7j6ScujKuhpRTA4l4OWg7oSukRbyRN7dc.C1pamu")
+			hashedPasswordFromDatabase := []byte("$2a$10$4Yhs5bfGgp4vz7j6ScujKuhpRTA4l4OWg7oSukRbyRN7dc.C1pamu")
 
-                if err := bcrypt.CompareHashAndPassword(hashedPasswordFromDatabase, []byte(password)); err != nil {
-                        log.Println("Either username or password is wrong")
-                        conditionsMap["LoginError"] = true
-                } else {
-                        log.Println("Logged in :", username)
-                        conditionsMap["Username"] = username
-                        conditionsMap["LoginError"] = false
+			if err := bcrypt.CompareHashAndPassword(hashedPasswordFromDatabase, []byte(password)); err != nil {
+				log.Println("Either username or password is wrong")
+				conditionsMap["LoginError"] = true
+			} else {
+				log.Println("Logged in :", username)
+				conditionsMap["Username"] = username
+				conditionsMap["LoginError"] = false
 
-                        err := res.Set_mode(0, username)
 
-                        if err == 0 { Authenticate(username, w, r) }
+				Authenticate(username, w, r)
 
-                        http.Redirect(w, r, "/dashboard", http.StatusFound)
-                }
+				http.Redirect(w, r, "/dashboard", http.StatusFound)
+			}
 
-        }
+		}
 
-        if err := logUserTemplate.Execute(w, conditionsMap); err != nil {
-                log.Println(err)
-        }
-    })
+		if err := logUserTemplate.Execute(w, conditionsMap); err != nil {
+			log.Println(err)
+		}
+	})
 }
 
 func MainHandler(w http.ResponseWriter, r *http.Request) {
-        conditionsMap := map[string]interface{}{}
+	conditionsMap := map[string]interface{}{}
 
-        //read from session
-        islogged, user := Current(r)
+	//read from session
+	islogged, user := Current(r)
+	fmt.Println("putaaaa")
 
-        if islogged == true {
-            log.Println("Username : ", user)
-            conditionsMap["Username"] = user
-        }
+	if islogged == true {
+		log.Println("Username : ", user)
+		conditionsMap["Username"] = user
+	}
 
-        if err := mainTemplate.Execute(w, conditionsMap); err != nil {
-                log.Println(err)
-        }
+	if err := mainTemplate.Execute(w, conditionsMap); err != nil {
+		log.Println(err)
+	}
 }
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 
-        Close(w, r)
+	Close(w, r)
 
-        w.Write([]byte("Logged out!"))
+	w.Write([]byte("Logged out!"))
 }
 
 func (s *Server) Run(drv *driver.Driver) {
@@ -141,10 +140,10 @@ func (s *Server) Run(drv *driver.Driver) {
 		log.Fatalf("failed read schema")
 	}
 
-    database       := s.db
-    r              := &model.Resolver{Db: database, Drv: drv}
+	database := s.db
+	r := &model.Resolver{Db: database, Drv: drv}
 
-    schema := graphql.MustParseSchema(string(fileschema), r, graphql.UseStringDescriptions())
+	schema := graphql.MustParseSchema(string(fileschema), r, graphql.UseStringDescriptions())
 
 	mux := http.NewServeMux()
 
@@ -153,11 +152,22 @@ func (s *Server) Run(drv *driver.Driver) {
 	mux.Handle("/dashboard", http.HandlerFunc(MainHandler))
 	mux.Handle("/logout", http.HandlerFunc(LogoutHandler))
 
-	mux.Handle("/query", &relay.Handler{Schema: schema})
+	mux.Handle("/query", authenticated(&relay.Handler{Schema: schema}, r))
 
 	log.WithFields(log.Fields{"time": time.Now()}).Info("starting server")
 
 	log.Fatal(http.ListenAndServe("localhost:8080", logged(mux)))
+}
+
+func authenticated(next http.Handler, res *model.Resolver) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		//islogged, user := Current(r)
+        islogged, request := Current_u(r, res)
+
+		if islogged == true {
+		    next.ServeHTTP(w, request)
+        }
+	})
 }
 
 // logging middleware

@@ -14,7 +14,7 @@ Edge Provisioning for Internet of Things
         * libvirt-dev # including headers and pkgfile
         * libvirt-qemu
         * cdrkit (genisoimage)
-        * go
+        * go > 1.10.4
             - epfiot (this repo)
             - libvirt-go
             - libvirt-go-xml

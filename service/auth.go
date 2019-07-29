@@ -5,10 +5,13 @@ import (
 	"net/http"
 	log "github.com/sirupsen/logrus"
     "fmt"
+	"github.com/semedi/epfiot/model"
+    "context"
 )
 
 var encryptionKey     = "something-very-secret"
 var loggedUserSession = sessions.NewCookieStore([]byte(encryptionKey))
+
 
 
 func init() {
@@ -61,4 +64,30 @@ func Current(r *http.Request) (bool, string) {
     }
 
    return success, logged_user
+}
+
+func Current_u(r *http.Request, res *model.Resolver) (bool, *http.Request) {
+    session, err := loggedUserSession.Get(r, "authenticated-user-session")
+    logged_user := ""
+
+    if err != nil {
+            log.Println("Unable to retrieve session data!", err)
+            return false, nil
+    }
+
+    if session != nil {
+        logged_user    = fmt.Sprintf("%v", session.Values["username"])
+        u, err := res.Db.Find_user(logged_user)
+
+        if err != nil || u == nil {
+
+            return false, nil
+        }
+
+        ctx := context.WithValue(r.Context(), "user", u)
+
+        return true, r.WithContext(ctx)
+    }
+
+    return false, nil
 }

@@ -64,7 +64,7 @@ func (db *DB) getUserVmIDs(userID uint) ([]int, error) {
 	return ids, nil
 }
 
-func (db *DB) find_user(username string) (*User, error) {
+func (db *DB) Find_user(username string) (*User, error) {
 	var user User
 
 	err := db.DB.First(&user, "name = ?", username).Error
