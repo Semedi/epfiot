@@ -1,17 +1,65 @@
 package main
 
 import (
-	d "github.com/semedi/epfiot/driver"
+	"github.com/semedi/epfiot/driver"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
+	"log"
     //"github.com/semedi/epfiot/service"
 )
 
-func main() {
-	driver := new(d.Controller)
+type conf struct {
+	Host   string `yaml:"host"`
+	Auth   string `yaml:"auth"`
+	Driver string `yaml:"driver"`
+}
 
-    driver.Init()
+func read_config() *conf {
+    config := new(conf)
+
+	yamlFile, err := ioutil.ReadFile("epfiot.conf")
+	if err != nil {
+		log.Printf("yamlFile.Get err   #%v ", err)
+	}
+	err = yaml.Unmarshal(yamlFile, config)
+	if err != nil {
+		log.Fatalf("Unmarshal: %v", err)
+	}
+
+	return config
+}
+
+func (c conf) uri() string {
+	var u string
+
+	if c.Host == "localhost" {
+		u = "qemu:///system"
+	} else {
+		u = "qemu+" + c.Auth + "://" + c.Host + "/system"
+	}
+
+	return u
+}
+
+func main() {
+    config := read_config()
+
+
+    controller := driver.New(config.uri())
+
+	//switch config.Driver {
+	//case "kvm":
+	//	c.driver = New_kvm(config.uri())
+	//default:
+	//	log.Fatalf("Unrecognized Driver")
+	//}
+
+
+	//driver := new(d.Controller)
+
     //server := service.New()
 
     //server.Run(driver)
 
-    driver.Start()
+    controller.Start()
 }
