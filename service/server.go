@@ -65,7 +65,6 @@ func LoginPageHandler(res *model.Resolver) http.Handler {
 
 		// check if session is active
 		islogged, user := Current(r)
-		log.Println("mierdaaaaa")
 
 		if islogged == true {
 			conditionsMap["Username"] = user
@@ -84,23 +83,20 @@ func LoginPageHandler(res *model.Resolver) http.Handler {
 			// the plain password is 'mynakedpassword'
 			// see https://www.socketloop.com/tutorials/golang-bcrypting-password for more details
 			// on how to generate bcrypted password
-
 			hashedPasswordFromDatabase := []byte("$2a$10$4Yhs5bfGgp4vz7j6ScujKuhpRTA4l4OWg7oSukRbyRN7dc.C1pamu")
-
 			if err := bcrypt.CompareHashAndPassword(hashedPasswordFromDatabase, []byte(password)); err != nil {
 				log.Println("Either username or password is wrong")
 				conditionsMap["LoginError"] = true
 			} else {
-				log.Println("Logged in :", username)
-				conditionsMap["Username"] = username
-				conditionsMap["LoginError"] = false
+                if (Authenticate(username, res, w, r)){
+                    http.Redirect(w, r, "/dashboard", http.StatusFound)
 
-
-				Authenticate(username, w, r)
-
-				http.Redirect(w, r, "/dashboard", http.StatusFound)
+				    conditionsMap["LoginError"] = false
+				    conditionsMap["Username"]   = username
+                } else {
+                    conditionsMap["LoginError"] = true
+                }
 			}
-
 		}
 
 		if err := logUserTemplate.Execute(w, conditionsMap); err != nil {
@@ -151,21 +147,22 @@ func (s *Server) Run(drv *driver.Driver) {
 	mux.Handle("/login", LoginPageHandler(r))
 	mux.Handle("/dashboard", http.HandlerFunc(MainHandler))
 	mux.Handle("/logout", http.HandlerFunc(LogoutHandler))
-
-	mux.Handle("/query", authenticated(&relay.Handler{Schema: schema}, r))
+	mux.Handle("/query", authenticated(&relay.Handler{Schema: schema}))
 
 	log.WithFields(log.Fields{"time": time.Now()}).Info("starting server")
 
 	log.Fatal(http.ListenAndServe("localhost:8080", logged(mux)))
 }
 
-func authenticated(next http.Handler, res *model.Resolver) http.Handler {
+func authenticated(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		//islogged, user := Current(r)
-        islogged, request := Current_u(r, res)
+        islogged, request := Retrieve_session(r)
 
 		if islogged == true {
 		    next.ServeHTTP(w, request)
+        }else{
+            http.Redirect(w, r, "/login", http.StatusForbidden)
         }
 	})
 }

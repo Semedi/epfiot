@@ -41,9 +41,9 @@ func (r *Resolver) GetUser(ctx context.Context, args struct{ ID graphql.ID }) (*
 }
 
 func (r *Resolver) GetVms(ctx context.Context) (*[]*VmResolver, error) {
-    user := ctx.Value("user").(*User)
+    id := ctx.Value("userid").(uint)
 
-    vms, err := r.Db.GetUserVms(user.ID)
+    vms, err := r.Db.GetUserVms(id)
 	if err != nil {
 		return nil, err
 	}

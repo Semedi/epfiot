@@ -13,7 +13,6 @@ var encryptionKey     = "something-very-secret"
 var loggedUserSession = sessions.NewCookieStore([]byte(encryptionKey))
 
 
-
 func init() {
     loggedUserSession.Options = &sessions.Options{
          // change domain to match your machine. Can be localhost
@@ -25,15 +24,21 @@ func init() {
     }
 }
 
-func Authenticate(username string, w http.ResponseWriter, r *http.Request) {
+func Authenticate(username string, res *model.Resolver, w http.ResponseWriter, r *http.Request) (bool){
     session, _ := loggedUserSession.New(r, "authenticated-user-session")
 
-    session.Values["username"] = username
-    err := session.Save(r, w)
+    u, err := res.Db.Find_user(username)
 
-    if err != nil {
-            log.Println(err)
+    if err != nil || u == nil {
+        return false
     }
+
+    session.Values["username"] = username
+    session.Values["userid"]   = u.ID
+
+    session.Save(r, w)
+
+    return true
 }
 
 func Close(w http.ResponseWriter, r *http.Request) {
@@ -66,7 +71,7 @@ func Current(r *http.Request) (bool, string) {
    return success, logged_user
 }
 
-func Current_u(r *http.Request, res *model.Resolver) (bool, *http.Request) {
+func Retrieve_session(r *http.Request) (bool, *http.Request) {
     session, err := loggedUserSession.Get(r, "authenticated-user-session")
     logged_user := ""
 
@@ -77,14 +82,11 @@ func Current_u(r *http.Request, res *model.Resolver) (bool, *http.Request) {
 
     if session != nil {
         logged_user    = fmt.Sprintf("%v", session.Values["username"])
-        u, err := res.Db.Find_user(logged_user)
+        log.Println("", logged_user)
 
-        if err != nil || u == nil {
 
-            return false, nil
-        }
-
-        ctx := context.WithValue(r.Context(), "user", u)
+        //ctx := context.WithValue(r.Context(), "user", logged_user)
+        ctx := context.WithValue(r.Context(), "userid", session.Values["userid"])
 
         return true, r.WithContext(ctx)
     }
