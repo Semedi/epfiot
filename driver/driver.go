@@ -6,15 +6,15 @@ import (
 	"log"
 )
 
-type Controller interface {
+type Driver interface {
 	Init()
 	Create()
 	List()
 	Close()
 }
 
-type Driver struct {
-	Controller
+type Controller struct {
+    driver Driver
 }
 type conf struct {
 	Host   string `yaml:"host"`
@@ -48,20 +48,20 @@ func (c conf) uri() string {
 	return u
 }
 
-func (d *Driver) Init() {
+func (c *Controller) Init() {
 	var config conf
 	config.get()
 
 	switch config.Driver {
 	case "kvm":
-		d.Controller = New_kvm(config.uri())
+		c.driver = New_kvm(config.uri())
 	default:
 		log.Fatalf("Unrecognized Driver")
 	}
 }
 
-func (d *Driver) Start() {
-	d.Controller.Create()
-	d.Controller.List()
-	d.Controller.Close()
+func (c *Controller) Start() {
+	c.driver.Create()
+	c.driver.List()
+	c.driver.Close()
 }
