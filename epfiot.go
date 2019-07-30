@@ -44,21 +44,9 @@ func (c conf) uri() string {
 func main() {
     config := read_config()
 
-
-    controller := driver.New(config.uri())
-
-	//switch config.Driver {
-	//case "kvm":
-	//	c.driver = New_kvm(config.uri())
-	//default:
-	//	log.Fatalf("Unrecognized Driver")
-	//}
-
-
-	//driver := new(d.Controller)
+    controller := driver.New(config.Driver ,config.uri())
 
     //server := service.New()
-
     //server.Run(driver)
 
     controller.Start()
