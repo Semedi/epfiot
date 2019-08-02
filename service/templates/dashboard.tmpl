@@ -1,0 +1,16 @@
+<html>
+<body>
+
+ {{if .Username}}
+    <p>logged as:<b>{{.Username}}</b>, welcome to epfiot PoC </p>
+	<ul>
+	  <li><a href="/dashboard">dashboard</a></li>
+	  <li><a href="/logout">Logout!</a></li>
+	</ul>
+ {{else}}
+         <p>Either your session has expired or you've logged out! <a href="/login">Login</a></p>
+ {{end}}
+
+</body>
+
+</html>

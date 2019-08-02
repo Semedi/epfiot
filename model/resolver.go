@@ -14,14 +14,15 @@ import (
 
 type Resolver struct {
 	Db *DB
-    Drv *driver.Driver
+    Controller *driver.Controller
 }
 
 
 // GetUser resolves the getUser query
 func (r *Resolver) GetUser(ctx context.Context, args struct{ ID graphql.ID }) (*UserResolver, error) {
 
-    r.Drv.Controller.Init()
+    r.Controller.Handler.Init()
+
 	id, err := gqlIDToUint(args.ID)
 	if err != nil {
 		return nil, err

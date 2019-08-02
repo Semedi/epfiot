@@ -1,40 +1,4 @@
-package service
-
-const dashBoardPage = `<html><body>
-
- {{if .Username}}
-    <p>logged as:<b>{{.Username}}</b>, welcome to epfiot PoC </p>
-	<ul>
-	  <li><a href="/dashboard">dashboard</a></li>
-	  <li><a href="/logout">Logout!</a></li>
-	</ul>
- {{else}}
-         <p>Either your session has expired or you've logged out! <a href="/login">Login</a></p>
- {{end}}
-
- </body></html>`
-
-
-const logUserPage = `<html><body>
- {{if .LoginError}}<p style="color:red">Either username or password is not in our record! Sign Up?</p>{{end}}
-
- <form method="post" action="/login">
-         {{if .Username}}
-                  <p><b>{{.Username}}</b>, you're already logged in! <a href="/logout">Logout!</a></p>
-         {{else}}
-                 <label>Username:</label>
-                 <input type="text" name="Username"><br>
-
-                 <label>Password:</label>
-                 <input type="password" name="Password">
-
-                 <span style="font-style:italic"> Enter: 'mynakedpassword'</span><br>
-                 <input type="submit" name="Login" value="Let me in!">
-         {{end}}
- </form>
- </body></html>`
-
-const mainPage = `<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 	<head>
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/graphiql/0.10.2/graphiql.css" />
@@ -75,4 +39,3 @@ const mainPage = `<!DOCTYPE html>
         {{end}}
 	</body>
 </html>
-`

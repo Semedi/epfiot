@@ -10,7 +10,7 @@ type Driver interface {
 }
 
 type Controller struct {
-    driver Driver
+    Handler Driver
 }
 
 func New(d string, uri string) *Controller{
@@ -22,16 +22,16 @@ func New(d string, uri string) *Controller{
             log.Fatalf("Unrecognized Driver")
 	}
 
-    c := &Controller{driver: drv}
+    c := &Controller{Handler: drv}
 
-    c.driver.Init()
+    c.Handler.Init()
 
     return  c
 }
 
 
 func (c *Controller) Start() {
-	c.driver.Create()
-	c.driver.List()
-	c.driver.Close()
+	c.Handler.Create()
+	c.Handler.List()
+	c.Handler.Close()
 }

@@ -17,16 +17,20 @@ import (
 	"html/template"
 )
 
-// from const.go:
-var dashboardTemplate = template.Must(template.New("").Parse(dashBoardPage))
-var logUserTemplate = template.Must(template.New("").Parse(logUserPage))
-var mainTemplate = template.Must(template.New("").Parse(mainPage))
+// templates:
+var dashboardTemplate *template.Template
+var logUserTemplate *template.Template
+var mainTemplate *template.Template
 
 type Server struct {
 	db *model.DB
 }
 
 func New() *Server {
+    dashboardTemplate = template.Must(template.ParseFiles("service/templates/dashboard.tmpl"))
+    logUserTemplate   = template.Must(template.ParseFiles("service/templates/login.tmpl"))
+    mainTemplate      = template.Must(template.ParseFiles("service/templates/main.tmpl"))
+
 	s := new(Server)
 
 	database, err := model.NewDB("./db.sqlite")
@@ -129,7 +133,7 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Logged out!"))
 }
 
-func (s *Server) Run(drv *driver.Driver) {
+func (s *Server) Run(drv *driver.Controller) {
 	fileschema, err := ioutil.ReadFile("model/schema")
 
 	if err != nil {
@@ -137,7 +141,7 @@ func (s *Server) Run(drv *driver.Driver) {
 	}
 
 	database := s.db
-	r := &model.Resolver{Db: database, Drv: drv}
+	r := &model.Resolver{Db: database, Controller: drv}
 
 	schema := graphql.MustParseSchema(string(fileschema), r, graphql.UseStringDescriptions())
 
