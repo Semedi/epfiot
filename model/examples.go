@@ -10,16 +10,16 @@ var users = []User{
 // Since the db is torn down and created on every run, I know the above users will have
 // ID's 1, 2, 3
 var vms = []Vm{
-	Vm{Name: "debian7", OwnerID: 1},
-	Vm{Name: "debian8", OwnerID: 1},
-	Vm{Name: "ubuntu", OwnerID: 1},
-	Vm{Name: "archlinux", OwnerID: 1},
-	Vm{Name: "coreOs", OwnerID: 1},
-	Vm{Name: "Centos", OwnerID: 1},
-	Vm{Name: "Manjaro", OwnerID: 1},
-	Vm{Name: "linuxmint", OwnerID: 2},
-	Vm{Name: "TinyCore", OwnerID: 3},
-	Vm{Name: "void", OwnerID: 3},
+    Vm{Name: "debian7", Base: "null", OwnerID: 1},
+	Vm{Name: "debian8", Base: "null",OwnerID: 1},
+	Vm{Name: "ubuntu", Base: "null",OwnerID: 1},
+	Vm{Name: "archlinux", Base: "null",OwnerID: 1},
+	Vm{Name: "coreOs", Base: "null",OwnerID: 1},
+	Vm{Name: "Centos", Base: "null",OwnerID: 1},
+	Vm{Name: "Manjaro", Base: "null",OwnerID: 1},
+	Vm{Name: "linuxmint", Base: "null",OwnerID: 2},
+	Vm{Name: "TinyCore", Base: "null",OwnerID: 3},
+	Vm{Name: "void", Base: "null",OwnerID: 3},
 }
 
 // Tags to be put in the database

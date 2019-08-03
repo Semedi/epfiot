@@ -116,13 +116,18 @@ func (r *Resolver) GetTag(ctx context.Context, args struct{ Title string }) (*Ta
 type vmInput struct {
 	ID      *graphql.ID
 	OwnerID int32
+    Base    string
 	Name    string
 	TagIDs  *[]*int32
 }
 
-// AddVm Resolves the addVm mutation
+// ddVm Resolves the addVm mutation
 func (r *Resolver) AddVm(ctx context.Context, args struct{ Vm vmInput }) (*VmResolver, error) {
-	vm, err := r.Db.addVm(args.Vm)
+    id := ctx.Value("userid").(uint)
+
+    driver.Copy_base(args.Vm.Base, id, args.Vm.Name)
+
+	vm, err := r.Db.addVm(args.Vm, id)
 	if err != nil {
 		return nil, err
 	}

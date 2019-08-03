@@ -2,7 +2,6 @@ package model
 
 import (
 	"context"
-
 	graphql "github.com/graph-gophers/graphql-go"
 	"github.com/jinzhu/gorm"
 )
@@ -11,6 +10,7 @@ import (
 type Vm struct {
 	gorm.Model
 	OwnerID uint
+    Base    string
 	Name    string
 	Tags    []Tag `gorm:"many2many:vms_tags"`
 }
@@ -44,6 +44,11 @@ func (p *VmResolver) Owner() (*UserResolver, error) {
 // Name resolves the name field for Vm
 func (p *VmResolver) Name(ctx context.Context) *string {
 	return &p.m.Name
+}
+
+// Base resolves the name field for Vm
+func (p *VmResolver) Base(ctx context.Context) *string {
+	return &p.m.Base
 }
 
 // Tags resolves the vm tags

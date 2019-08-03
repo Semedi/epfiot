@@ -225,7 +225,7 @@ func (db *DB) deleteVm(userID, VmID uint) (*bool, error) {
 	return boolP(true), err
 }
 
-func (db *DB) addVm(input vmInput) (*Vm, error) {
+func (db *DB) addVm(input vmInput, userid uint) (*Vm, error) {
 	// get the M2M relation tags from the DB and put them in the vm to be saved
 	var t []Tag
 	err := db.DB.Where("id in (?)", input.TagIDs).Find(&t).Error
@@ -235,7 +235,8 @@ func (db *DB) addVm(input vmInput) (*Vm, error) {
 
 	vm := Vm{
 		Name:    input.Name,
-		OwnerID: uint(input.OwnerID),
+        Base:    input.Base,
+		OwnerID: userid,
 		Tags:    t,
 	}
 

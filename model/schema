@@ -24,6 +24,7 @@ type Vm {
   id: ID
   owner: User
   name: String
+  base: String
   tags: [Tag]
 }
 
@@ -67,7 +68,7 @@ type PageInfo {
 
 input VmInput {
   id: ID
-  ownerID: ID!
+  base: String!
   name: String!
   tagIDs: [Int]
 }
