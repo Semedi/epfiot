@@ -1,4 +1,4 @@
-package model
+package core
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 
 	graphql "github.com/graph-gophers/graphql-go"
 	"github.com/semedi/epfiot/driver"
+	"github.com/semedi/epfiot/core/model"
 )
 
 
@@ -188,4 +189,140 @@ func decodeCursor(s string) (int, error) {
 	}
 
 	return i, nil
+}
+
+// UserResolver contains the database and the user model to resolve against
+type UserResolver struct {
+	db *DB
+	m  model.User
+}
+
+// ID resolves the user ID
+func (u *UserResolver) ID(ctx context.Context) *graphql.ID {
+	return gqlIDP(u.m.ID)
+}
+
+// Name resolves the Name field for User, it is all caps to avoid name clashes
+func (u *UserResolver) Name(ctx context.Context) *string {
+	return &u.m.Name
+}
+
+// Vms resolves the Vms field for User
+func (u *UserResolver) Vms(ctx context.Context) (*[]*VmResolver, error) {
+	vms, err := u.db.GetUserVms(u.m.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	r := make([]*VmResolver, len(vms))
+	for i := range vms {
+		r[i] = &VmResolver{
+			db: u.db,
+			m:  vms[i],
+		}
+	}
+
+	return &r, nil
+}
+
+// TagResolver contains the db and the Tag model for resolving
+type TagResolver struct {
+	db *DB
+	m  model.Tag
+}
+
+// ID resolves the ID for Tag
+func (t *TagResolver) ID(ctx context.Context) *graphql.ID {
+	return gqlIDP(t.m.ID)
+}
+
+// Title resolves the title field
+func (t *TagResolver) Title(ctx context.Context) *string {
+	return &t.m.Title
+}
+
+// Vms resolves the vmsvnoremap field
+func (t *TagResolver) Vms(ctx context.Context) (*[]*VmResolver, error) {
+	vms, err := t.db.getTagVms(&t.m)
+	if err != nil {
+		return nil, err
+	}
+
+	r := make([]*VmResolver, len(vms))
+	for i := range vms {
+		r[i] = &VmResolver{
+			db: t.db,
+			m:  vms[i],
+		}
+	}
+
+	return &r, nil
+}
+
+// VmResolver contains the DB and the model for resolving
+type VmResolver struct {
+	db *DB
+	m  model.Vm
+}
+
+// ID resolves the ID field for Vm
+func (p *VmResolver) ID(ctx context.Context) *graphql.ID {
+	return gqlIDP(p.m.ID)
+}
+
+// Owner resolves the owner field for Vm
+func (p *VmResolver) Owner() (*UserResolver, error) {
+	user, err := p.db.getVmOwner(int32(p.m.OwnerID))
+	if err != nil {
+		return nil, err
+	}
+
+	r := UserResolver{
+		db: p.db,
+		m:  *user,
+	}
+
+	return &r, nil
+}
+
+// Name resolves the name field for Vm
+func (p *VmResolver) Name(ctx context.Context) *string {
+	return &p.m.Name
+}
+
+// Base resolves the name field for Vm
+func (p *VmResolver) Base(ctx context.Context) *string {
+	return &p.m.Base
+}
+
+// Tags resolves the vm tags
+func (p *VmResolver) Tags(ctx context.Context) (*[]*TagResolver, error) {
+	tags, err := p.db.getVmTags(&p.m)
+	if err != nil {
+		return nil, err
+	}
+
+	r := make([]*TagResolver, len(tags))
+	for i := range tags {
+		r[i] = &TagResolver{
+			db: p.db,
+			m:  tags[i],
+		}
+	}
+
+	return &r, nil
+}
+
+func gqlIDToUint(i graphql.ID) (uint, error) {
+	r, err := strconv.ParseInt(string(i), 10, 32)
+	if err != nil {
+		return 0, err
+	}
+
+	return uint(r), nil
+}
+
+func gqlIDP(id uint) *graphql.ID {
+	r := graphql.ID(fmt.Sprint(id))
+	return &r
 }

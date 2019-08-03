@@ -5,7 +5,7 @@ import (
 	"net/http"
 	log "github.com/sirupsen/logrus"
     "fmt"
-	"github.com/semedi/epfiot/model"
+	"github.com/semedi/epfiot/core"
     "context"
 )
 
@@ -24,7 +24,7 @@ func init() {
     }
 }
 
-func Authenticate(username string, res *model.Resolver, w http.ResponseWriter, r *http.Request) (bool){
+func Authenticate(username string, res *core.Resolver, w http.ResponseWriter, r *http.Request) (bool){
     session, _ := loggedUserSession.New(r, "authenticated-user-session")
 
     u, err := res.Db.Find_user(username)

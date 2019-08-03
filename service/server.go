@@ -12,7 +12,7 @@ import (
 	"github.com/graph-gophers/graphql-go/relay"
 
 	"github.com/semedi/epfiot/driver"
-	"github.com/semedi/epfiot/model"
+	"github.com/semedi/epfiot/core"
 	"golang.org/x/crypto/bcrypt"
 	"html/template"
 )
@@ -23,7 +23,7 @@ var logUserTemplate *template.Template
 var mainTemplate *template.Template
 
 type Server struct {
-	db *model.DB
+	db *core.DB
 }
 
 func New() *Server {
@@ -33,7 +33,7 @@ func New() *Server {
 
 	s := new(Server)
 
-	database, err := model.NewDB("./db.sqlite")
+	database, err := core.NewDB("./db.sqlite")
 	if err != nil {
 		panic(err)
 	}
@@ -62,7 +62,7 @@ func DashBoardPageHandler() http.Handler {
 	})
 }
 
-func LoginPageHandler(res *model.Resolver) http.Handler {
+func LoginPageHandler(res *core.Resolver) http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		conditionsMap := map[string]interface{}{}
@@ -134,14 +134,14 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) Run(drv *driver.Controller) {
-	fileschema, err := ioutil.ReadFile("model/schema")
+	fileschema, err := ioutil.ReadFile("core/schema")
 
 	if err != nil {
 		log.Fatalf("failed read schema")
 	}
 
 	database := s.db
-	r := &model.Resolver{Db: database, Controller: drv}
+	r := &core.Resolver{Db: database, Controller: drv}
 
 	schema := graphql.MustParseSchema(string(fileschema), r, graphql.UseStringDescriptions())
 
