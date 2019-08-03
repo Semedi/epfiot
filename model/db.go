@@ -2,7 +2,6 @@ package model
 
 import (
 	"math/rand"
-
 	"github.com/jinzhu/gorm"
 	// nolint: gotype
 	_ "github.com/jinzhu/gorm/dialects/sqlite"

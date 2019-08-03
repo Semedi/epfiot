@@ -14,7 +14,7 @@ type Query {
 
 "The mutation type, represents all updates we can make to our data"
 type Mutation {
-  addVm(vm: VmInput!): Vm
+  createVm(vm: VmInput!): Vm
   updateVm(vm: VmInput!): Vm
   deleteVm(userID: ID!, vmID: ID!): Boolean
 }

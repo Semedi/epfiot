@@ -121,8 +121,8 @@ type vmInput struct {
 	TagIDs  *[]*int32
 }
 
-// ddVm Resolves the addVm mutation
-func (r *Resolver) AddVm(ctx context.Context, args struct{ Vm vmInput }) (*VmResolver, error) {
+// ddVm Resolves the createvm mutation
+func (r *Resolver) CreateVm(ctx context.Context, args struct{ Vm vmInput }) (*VmResolver, error) {
     id := ctx.Value("userid").(uint)
 
     driver.Copy_base(args.Vm.Base, id, args.Vm.Name)

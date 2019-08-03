@@ -5,7 +5,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
-    //"github.com/semedi/epfiot/service"
+    "github.com/semedi/epfiot/service"
 )
 
 type conf struct {
@@ -45,10 +45,10 @@ func main() {
     config := read_config()
     driver.Initfs("/storage")
 
-    //server := service.New()
+    server := service.New()
     controller := driver.New(config.Driver ,config.uri())
 
-    //server.Run(controller)
+    server.Run(controller)
 
 
     controller.Start()
