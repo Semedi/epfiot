@@ -33,11 +33,6 @@ func domain_def() libvirtxml.Domain {
 				Type: "hvm",
 			},
 		},
-		Memory: &libvirtxml.DomainMemory{
-			Value:    512,
-			Unit:     "MB",
-			DumpCore: "on",
-		},
 		VCPU: &libvirtxml.DomainVCPU{
 			Placement: "static",
 			Value:     1,
@@ -99,14 +94,23 @@ func setDevices(d *libvirtxml.Domain) {
 		},
 	}
 }
+func setMemory(d *libvirtxml.Domain) {
+    d.Memory= &libvirtxml.DomainMemory{
+                Value:    2048,
+                Unit:     "MB",
+                DumpCore: "on",
+	        }
+}
 
 func (l *Libvirt) Create() {
 	domcfg := domain_def()
 	domcfg.Name = "demo02"
 
 	setDevices(&domcfg)
+    setMemory(&domcfg)
 
 	xml, err := domcfg.Marshal()
+
 	if err != nil {
 		panic(err)
 	}
