@@ -6,6 +6,7 @@ import (
 
 	libvirt "github.com/libvirt/libvirt-go"
 	libvirtxml "github.com/libvirt/libvirt-go-xml"
+    "github.com/semedi/epfiot/core/model"
 )
 
 type Libvirt struct {
@@ -102,9 +103,9 @@ func setMemory(d *libvirtxml.Domain) {
 	        }
 }
 
-func (l *Libvirt) Create() {
+func (l *Libvirt) Create(vm model.Vm) {
 	domcfg := domain_def()
-	domcfg.Name = "demo02"
+	domcfg.Name = vm.Name
 
 	setDevices(&domcfg)
     setMemory(&domcfg)

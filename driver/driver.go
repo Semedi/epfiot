@@ -1,10 +1,13 @@
 package driver
 
-import "log"
+import (
+    "log"
+    "github.com/semedi/epfiot/core/model"
+)
 
 type Driver interface {
 	Init()
-	Create()
+	Create(vm model.Vm)
 	List()
 	Close()
 }
@@ -31,7 +34,6 @@ func New(d string, uri string) *Controller{
 
 
 func (c *Controller) Start() {
-	c.Handler.Create()
 	c.Handler.List()
 	c.Handler.Close()
 }

@@ -132,6 +132,7 @@ func (r *Resolver) CreateVm(ctx context.Context, args struct{ Vm vmInput }) (*Vm
 	if err != nil {
 		return nil, err
 	}
+    r.Controller.Handler.Create(*vm)
 
 	s := VmResolver{
 		db: r.Db,
