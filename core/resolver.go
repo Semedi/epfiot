@@ -119,6 +119,8 @@ type vmInput struct {
 	OwnerID int32
     Base    string
 	Name    string
+    Memory  int32
+    Vcpu    int32
 	TagIDs  *[]*int32
 }
 
@@ -291,7 +293,19 @@ func (p *VmResolver) Name(ctx context.Context) *string {
 	return &p.m.Name
 }
 
-// Base resolves the name field for Vm
+// memory resolves the memory field for Vm
+func (p *VmResolver) Memory(ctx context.Context) *int32 {
+    r := int32(p.m.Memory)
+	return &r
+}
+
+// vcpu resolves the vcpu field for Vm
+func (p *VmResolver) Vcpu(ctx context.Context) *int32 {
+    r := int32(p.m.Vcpu)
+	return &r
+}
+
+// Base resolves the base field for Vm
 func (p *VmResolver) Base(ctx context.Context) *string {
 	return &p.m.Base
 }

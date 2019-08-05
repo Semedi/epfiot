@@ -238,6 +238,8 @@ func (db *DB) addVm(input vmInput, userid uint) (*model.Vm, error) {
 	vm := model.Vm{
 		Name:    input.Name,
         Base:    input.Base,
+        Memory:  (int)(input.Memory),
+        Vcpu:    (int)(input.Vcpu),
 		OwnerID: userid,
 		Tags:    t,
 	}

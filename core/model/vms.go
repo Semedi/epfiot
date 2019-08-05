@@ -10,5 +10,7 @@ type Vm struct {
 	OwnerID uint
     Base    string
 	Name    string
+    Memory  int
+    Vcpu    int
 	Tags    []Tag `gorm:"many2many:vms_tags"`
 }

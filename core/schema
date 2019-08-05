@@ -25,6 +25,8 @@ type Vm {
   owner: User
   name: String
   base: String
+  vcpu: Int
+  memory: Int
   tags: [Tag]
 }
 
@@ -70,5 +72,7 @@ input VmInput {
   id: ID
   base: String!
   name: String!
+  memory: Int = 256
+  vcpu:   Int = 1
   tagIDs: [Int]
 }
