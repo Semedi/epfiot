@@ -10,6 +10,7 @@ type Driver interface {
 	Create(vm model.Vm, uid uint)
 	List()
 	Listt()
+    Destroy(query string) (error)
 	Close()
 }
 

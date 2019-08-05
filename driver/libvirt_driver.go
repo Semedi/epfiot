@@ -62,9 +62,38 @@ func (l *Libvirt) Close() {
 
 
 
-//func (l *Libvirt) Get(name string, flag int) {
-//
-//}
+func (l *Libvirt) get(query string) (bool, *libvirt.Domain){
+    doms := l.get_all()
+
+	for _, dom := range doms {
+		name, err := dom.GetName()
+		if err == nil {
+			fmt.Printf("  %s\n", name)
+		}
+
+        if name == query{
+            return true, &dom
+        }
+
+		dom.Free()
+	}
+
+    return false, nil
+}
+
+func (l *Libvirt) Destroy(query string) (error){
+    r, dom := l.get(query)
+
+    if  r == true{
+        err := dom.Destroy()
+
+        if err != nil {
+            return err
+        }
+    }
+
+    return nil
+}
 
 
 // take care of free the c pointer after calling this method

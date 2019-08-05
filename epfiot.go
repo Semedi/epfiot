@@ -1,5 +1,4 @@
 package main
-
 import (
 	"github.com/semedi/epfiot/driver"
 	"gopkg.in/yaml.v2"
@@ -48,7 +47,7 @@ func main() {
     //server := service.New()
     controller := driver.New(config.Driver ,config.uri())
 
-    controller.Handler.Listt()
+    controller.Handler.Destroy("polla")
 
 
 
