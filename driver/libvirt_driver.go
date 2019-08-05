@@ -1,8 +1,8 @@
 package driver
 
 import (
-	"fmt"
 	"log"
+	"fmt"
 
 	libvirt "github.com/libvirt/libvirt-go"
 	libvirtxml "github.com/libvirt/libvirt-go-xml"
@@ -26,7 +26,7 @@ func New_kvm(c string) *Libvirt {
 	return l
 }
 
-func domain_def() libvirtxml.Domain {
+func domain_def(vcpu int) libvirtxml.Domain {
 	domcfg := libvirtxml.Domain{
 		Type: "kvm",
 		OS: &libvirtxml.DomainOS{
@@ -36,7 +36,7 @@ func domain_def() libvirtxml.Domain {
 		},
 		VCPU: &libvirtxml.DomainVCPU{
 			Placement: "static",
-			Value:     1,
+			Value:     vcpu,
 		},
 		CPU: &libvirtxml.DomainCPU{Mode: "host-model"},
 		Devices: &libvirtxml.DomainDeviceList{
@@ -60,11 +60,30 @@ func (l *Libvirt) Close() {
 	defer l.conn.Close()
 }
 
-func (l *Libvirt) List() {
-	doms, err := l.conn.ListAllDomains(libvirt.CONNECT_LIST_DOMAINS_INACTIVE)
+
+
+//func (l *Libvirt) Get(name string, flag int) {
+//
+//}
+
+
+// take care of free the c pointer after calling this method
+func (l *Libvirt) get_all()([]libvirt.Domain) {
+	da, err := l.conn.ListAllDomains(libvirt.CONNECT_LIST_DOMAINS_ACTIVE)
 	if err != nil {
 		panic(err)
 	}
+
+	di, err := l.conn.ListAllDomains(libvirt.CONNECT_LIST_DOMAINS_INACTIVE)
+	if err != nil {
+		panic(err)
+	}
+
+    return append(da, di...)
+}
+
+func (l *Libvirt) List() {
+    doms := l.get_all()
 
 	fmt.Printf("%d running domains:\n", len(doms))
 	for _, dom := range doms {
@@ -76,7 +95,17 @@ func (l *Libvirt) List() {
 	}
 }
 
-func setDevices(d *libvirtxml.Domain) {
+//1 : CONNECT_LIST_DOMAINS_ACTIVE
+//2 : CONNECT_LIST_DOMAINS_INACTIVE
+//4 : CONNECT_LIST_DOMAINS_PERSISTENT
+//16: CONNECT_LIST_DOMAINS_RUNNING
+//32: CONNECT_LIST_DOMAINS_PAUSED
+//64: CONNECT_LIST_DOMAINS_SHUTOFF
+func (l *Libvirt) Listt() {
+    l.List()
+}
+
+func setDevices(d *libvirtxml.Domain, ilocation string) {
 	d.Devices.Interfaces = []libvirtxml.DomainInterface{
 		{
 			Source: &libvirtxml.DomainInterfaceSource{
@@ -88,26 +117,26 @@ func setDevices(d *libvirtxml.Domain) {
 	}
 	d.Devices.Disks = []libvirtxml.DomainDisk{
 		{
-			Source: &libvirtxml.DomainDiskSource{File: &libvirtxml.DomainDiskSourceFile{File: "/home/semedi/Virtual/vm.qcow2"}},
+			Source: &libvirtxml.DomainDiskSource{File: &libvirtxml.DomainDiskSourceFile{File: ilocation}},
 			Driver: &libvirtxml.DomainDiskDriver{Name: "qemu", Type: "qcow2"},
 			Target: &libvirtxml.DomainDiskTarget{Dev: "hda", Bus: "virtio"},
 		},
 	}
 }
-func setMemory(d *libvirtxml.Domain) {
+func setMemory(d *libvirtxml.Domain, m int) {
     d.Memory= &libvirtxml.DomainMemory{
-                Value:    2048,
+                Value:    (uint)(m),
                 Unit:     "MB",
                 DumpCore: "on",
 	        }
 }
 
-func (l *Libvirt) Create(vm model.Vm) {
-	domcfg := domain_def()
-	domcfg.Name = vm.Name
+func (l *Libvirt) Create(vm model.Vm, uid uint) {
+	domcfg := domain_def(vm.Vcpu)
 
-	setDevices(&domcfg)
-    setMemory(&domcfg)
+	domcfg.Name = vm.Name
+	setDevices(&domcfg, Vmfile(uid, vm.Name))
+    setMemory(&domcfg, vm.Memory)
 
 	xml, err := domcfg.Marshal()
 

@@ -7,8 +7,9 @@ import (
 
 type Driver interface {
 	Init()
-	Create(vm model.Vm)
+	Create(vm model.Vm, uid uint)
 	List()
+	Listt()
 	Close()
 }
 
@@ -34,6 +35,5 @@ func New(d string, uri string) *Controller{
 
 
 func (c *Controller) Start() {
-	c.Handler.List()
 	c.Handler.Close()
 }
