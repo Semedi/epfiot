@@ -54,7 +54,6 @@ func domain_def() libvirtxml.Domain {
 }
 
 func (l *Libvirt) Init() {
-	fmt.Println("putaaaa")
 }
 
 func (l *Libvirt) Close() {

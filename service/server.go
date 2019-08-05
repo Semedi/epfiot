@@ -114,7 +114,6 @@ func MainHandler(w http.ResponseWriter, r *http.Request) {
 
 	//read from session
 	islogged, user := Current(r)
-	fmt.Println("putaaaa")
 
 	if islogged == true {
 		log.Println("Username : ", user)
