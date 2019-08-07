@@ -17,18 +17,19 @@ import (
 )
 
 // templates:
-var dashboardTemplate *template.Template
-var logUserTemplate *template.Template
-var mainTemplate *template.Template
+var frontend *template.Template
 
 type Server struct {
 	db *core.DB
 }
 
 func New() *Server {
-    dashboardTemplate = template.Must(template.ParseFiles("service/front/panel.html", "service/front/endpanel.html", "service/front/graphql.html"))
-    logUserTemplate   = template.Must(template.ParseFiles("service/front/login.html"))
-    mainTemplate      = template.Must(template.ParseFiles("service/front/graphql.html"))
+    var r error
+    frontend, r = template.ParseGlob("service/front/*.html")
+    if r != nil {
+        panic(r)
+    }
+
 
 	s := new(Server)
 
@@ -53,13 +54,15 @@ func DashBoardPageHandler() http.Handler {
 		if islogged == true {
 			log.Println("Username : ", user)
 			conditionsMap["Username"] = user
-		} else {
-            http.Redirect(w, r, "/login", http.StatusFound)
-        }
 
-		if err := dashboardTemplate.Execute(w, conditionsMap); err != nil {
-			log.Println(err)
-		}
+            if err := frontend.ExecuteTemplate(w,"graphql.html", conditionsMap); err != nil {
+                log.Println(err)
+            }
+
+
+		} else {
+            http.Redirect(w, r, "/login", http.StatusForbidden)
+        }
 	})
 }
 
@@ -75,40 +78,43 @@ func LoginPageHandler(res *core.Resolver) http.Handler {
 
 			conditionsMap["Username"] = user
 			log.Println("entro en logeado")
+
             http.Redirect(w, r, "/dashboard", http.StatusFound)
-		}
+		} else {
 
-		// verify username and password
-		if r.FormValue("Username") != "" && r.FormValue("Password") != "" {
-			username := r.FormValue("Username")
-			password := r.FormValue("Password")
+            // verify username and password
+            if r.FormValue("Username") != "" && r.FormValue("Password") != "" {
+                username := r.FormValue("Username")
+                password := r.FormValue("Password")
 
-			// NOTE: here is where you want to query your database to retrieve the hashed password
-			// for username.
-			// For this tutorial and simplicity sake, we will simulate the retrieved hashed password
-			// as $2a$10$4Yhs5bfGgp4vz7j6ScujKuhpRTA4l4OWg7oSukRbyRN7dc.C1pamu
-			// the plain password is 'mynakedpassword'
-			// see https://www.socketloop.com/tutorials/golang-bcrypting-password for more details
-			// on how to generate bcrypted password
-			hashedPasswordFromDatabase := []byte("$2a$10$4Yhs5bfGgp4vz7j6ScujKuhpRTA4l4OWg7oSukRbyRN7dc.C1pamu")
-			if err := bcrypt.CompareHashAndPassword(hashedPasswordFromDatabase, []byte(password)); err != nil {
-				log.Println("Either username or password is wrong")
-				conditionsMap["LoginError"] = true
-			} else {
-                if (Authenticate(username, res, w, r)){
-                    http.Redirect(w, r, "/dashboard", http.StatusFound)
-
-				    conditionsMap["LoginError"] = false
-				    conditionsMap["Username"]   = username
-                } else {
+                // NOTE: here is where you want to query your database to retrieve the hashed password
+                // for username.
+                // For this tutorial and simplicity sake, we will simulate the retrieved hashed password
+                // as $2a$10$4Yhs5bfGgp4vz7j6ScujKuhpRTA4l4OWg7oSukRbyRN7dc.C1pamu
+                // the plain password is 'mynakedpassword'
+                // see https://www.socketloop.com/tutorials/golang-bcrypting-password for more details
+                // on how to generate bcrypted password
+                hashedPasswordFromDatabase := []byte("$2a$10$4Yhs5bfGgp4vz7j6ScujKuhpRTA4l4OWg7oSukRbyRN7dc.C1pamu")
+                if err := bcrypt.CompareHashAndPassword(hashedPasswordFromDatabase, []byte(password)); err != nil {
+                    log.Println("Either username or password is wrong")
                     conditionsMap["LoginError"] = true
-                }
-			}
-		}
+                } else {
+                    if (Authenticate(username, res, w, r)){
+                        http.Redirect(w, r, "/dashboard", http.StatusFound)
 
-		if err := logUserTemplate.Execute(w, conditionsMap); err != nil {
-			log.Println(err)
-		}
+                        conditionsMap["LoginError"] = false
+                        conditionsMap["Username"]   = username
+                    } else {
+                        conditionsMap["LoginError"] = true
+                    }
+                }
+            }
+
+            if err := frontend.ExecuteTemplate(w,"login.html", conditionsMap); err != nil {
+                log.Println(err)
+            }
+        }
+
 	})
 }
 
@@ -121,18 +127,20 @@ func MainHandler(w http.ResponseWriter, r *http.Request) {
 	if islogged == true {
 		log.Println("Username : ", user)
 		conditionsMap["Username"] = user
-	}
 
-	if err := mainTemplate.Execute(w, conditionsMap); err != nil {
-		log.Println(err)
-	}
+        if err := frontend.ExecuteTemplate(w,"graphql.html", conditionsMap); err != nil {
+            log.Println(err)
+        }
+	} else {
+            http.Redirect(w, r, "/login", http.StatusForbidden)
+    }
+
 }
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	Close(w, r)
-
-	w.Write([]byte("Logged out!"))
+    http.Redirect(w, r, "/login", http.StatusFound)
 }
 
 func (s *Server) Run(drv *driver.Controller) {

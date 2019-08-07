@@ -65,7 +65,7 @@ func Current(r *http.Request) (bool, string) {
 
     if session != nil {
         logged_user    = fmt.Sprintf("%v", session.Values["username"])
-        success        = logged_user != "<nil>"
+        success        = logged_user != "<nil>" && logged_user != ""
     }
 
    return success, logged_user
