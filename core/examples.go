@@ -4,9 +4,9 @@ import "github.com/semedi/epfiot/core/model"
 
 // TEST DATA TO BE PUT INTO THE DB
 var users = []model.User{
-	model.User{Name: "Alice"},
-	model.User{Name: "Bob"},
-	model.User{Name: "Charlie"},
+	model.User{Name: "Alice@gmail.com"},
+	model.User{Name: "Bob@gmail.com"},
+	model.User{Name: "Charlie@gmail.com"},
 }
 
 // Since the db is torn down and created on every run, I know the above users will have

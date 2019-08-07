@@ -16,3 +16,22 @@ mutation {
 }
 
 seems that ! in schema means mandatory
+#{
+#  getVms() {
+#   name, id
+#  }
+#}
+
+
+
+
+mutation {
+  createVm( vm: {name: "polla", base: "dummy.qcow2"}){
+    
+    owner {
+      id
+    }, name, base
+  }
+}
+
+

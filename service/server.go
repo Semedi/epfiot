@@ -26,9 +26,9 @@ type Server struct {
 }
 
 func New() *Server {
-    dashboardTemplate = template.Must(template.ParseFiles("service/templates/dashboard.tmpl"))
-    logUserTemplate   = template.Must(template.ParseFiles("service/templates/login.tmpl"))
-    mainTemplate      = template.Must(template.ParseFiles("service/templates/main.tmpl"))
+    dashboardTemplate = template.Must(template.ParseFiles("service/front/panel.html", "service/front/endpanel.html", "service/front/graphql.html"))
+    logUserTemplate   = template.Must(template.ParseFiles("service/front/login.html"))
+    mainTemplate      = template.Must(template.ParseFiles("service/front/graphql.html"))
 
 	s := new(Server)
 
@@ -53,7 +53,9 @@ func DashBoardPageHandler() http.Handler {
 		if islogged == true {
 			log.Println("Username : ", user)
 			conditionsMap["Username"] = user
-		}
+		} else {
+            http.Redirect(w, r, "/login", http.StatusFound)
+        }
 
 		if err := dashboardTemplate.Execute(w, conditionsMap); err != nil {
 			log.Println(err)
@@ -70,12 +72,14 @@ func LoginPageHandler(res *core.Resolver) http.Handler {
 		islogged, user := Current(r)
 
 		if islogged == true {
+
 			conditionsMap["Username"] = user
 			log.Println("entro en logeado")
+            http.Redirect(w, r, "/dashboard", http.StatusFound)
 		}
 
 		// verify username and password
-		if r.FormValue("Login") != "" && r.FormValue("Username") != "" {
+		if r.FormValue("Username") != "" && r.FormValue("Password") != "" {
 			username := r.FormValue("Username")
 			password := r.FormValue("Password")
 
@@ -134,6 +138,8 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 func (s *Server) Run(drv *driver.Controller) {
 	fileschema, err := ioutil.ReadFile("core/schema")
 
+    fs := http.FileServer(http.Dir("service/front/static"))
+
 	if err != nil {
 		log.Fatalf("failed read schema")
 	}
@@ -150,6 +156,8 @@ func (s *Server) Run(drv *driver.Controller) {
 	mux.Handle("/dashboard", http.HandlerFunc(MainHandler))
 	mux.Handle("/logout", http.HandlerFunc(LogoutHandler))
 	mux.Handle("/query", authenticated(&relay.Handler{Schema: schema}))
+
+    mux.Handle("/static/", http.StripPrefix("/static", fs))
 
 	log.WithFields(log.Fields{"time": time.Now()}).Info("starting server")
 
