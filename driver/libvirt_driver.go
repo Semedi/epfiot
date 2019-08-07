@@ -134,6 +134,11 @@ func (l *Libvirt) Listt() {
     l.List()
 }
 
+//Source: &libvirtxml.DomainInterfaceSource{
+//    Bridge: &libvirtxml.DomainInterfaceSourceBridge{
+//        Bridge: "epfiot_net",
+//    },
+//},
 func setDevices(d *libvirtxml.Domain, ilocation string) {
 	d.Devices.Interfaces = []libvirtxml.DomainInterface{
 		{
@@ -182,3 +187,4 @@ func (l *Libvirt) Create(vm model.Vm, uid uint) {
 
 	fmt.Println(domain.GetName())
 }
+
