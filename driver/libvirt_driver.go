@@ -82,13 +82,27 @@ func (l *Libvirt) get(query string) (bool, *libvirt.Domain){
 }
 
 func (l *Libvirt) Destroy(query string) (error){
+
     r, dom := l.get(query)
 
     if  r == true{
-        err := dom.Destroy()
+
+        info, err := dom.GetInfo()
 
         if err != nil {
             return err
+        }else {
+
+            //SHUTOFF
+            if info.State == 5{
+                err := dom.Undefine()
+                if err != nil { return err }
+            }
+            //RUNNING
+            if info.State == 1{
+                err := dom.Destroy()
+                if err != nil { return err }
+            }
         }
     }
 
