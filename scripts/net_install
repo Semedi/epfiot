@@ -1,0 +1,17 @@
+#!/bin/bash
+
+DEFAULT=$(ip r | grep default | awk '{print $5}')
+
+NET=epfiot-net
+ADDR=10.0.0.1/24
+
+if [[ -n `ip a | grep $NET` ]]; then
+    ip link delete $NET type bridge
+fi
+
+ip link add name $NET type bridge
+ip link set $NET up
+
+ip addr add dev $NET $ADDR
+
+iptables -t nat -A POSTROUTING -o $DEFAULT -j MASQUERADE

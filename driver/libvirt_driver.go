@@ -136,19 +136,26 @@ func (l *Libvirt) Listt() {
 
 //Source: &libvirtxml.DomainInterfaceSource{
 //    Bridge: &libvirtxml.DomainInterfaceSourceBridge{
-//        Bridge: "epfiot_net",
+//        Bridge: "epfiot-net",
 //    },
 //},
+//Source: &libvirtxml.DomainInterfaceSource{
+//	Network: &libvirtxml.DomainInterfaceSourceNetwork{
+//		Network: "epfiot-vm",
+//	},
+//},
+
 func setDevices(d *libvirtxml.Domain, ilocation string) {
 	d.Devices.Interfaces = []libvirtxml.DomainInterface{
-		{
-			Source: &libvirtxml.DomainInterfaceSource{
-				Network: &libvirtxml.DomainInterfaceSourceNetwork{
-					Network: "epfiot-vm",
-				},
-			},
-		},
-	}
+        {
+            Source: &libvirtxml.DomainInterfaceSource{
+                Bridge: &libvirtxml.DomainInterfaceSourceBridge{
+                    Bridge: "epfiot-net",
+                },
+		    },
+	    },
+    }
+
 	d.Devices.Disks = []libvirtxml.DomainDisk{
 		{
 			Source: &libvirtxml.DomainDiskSource{File: &libvirtxml.DomainDiskSourceFile{File: ilocation}},
