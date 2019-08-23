@@ -43,6 +43,36 @@ func New() *Server {
 	return s
 }
 
+func render(cond string, file string, w http.ResponseWriter, r *http.Request) {
+    conditionsMap := map[string]interface{}{}
+	islogged, user := Current(r)
+    if islogged == true {
+        log.Println("Username : ", user)
+        conditionsMap["Username"]  = user
+        conditionsMap[cond]        = true
+
+        if err := frontend.ExecuteTemplate(w, file, conditionsMap); err != nil {
+            log.Println(err)
+        }
+
+
+    } else {
+        http.Redirect(w, r, "/login", http.StatusForbidden)
+    }
+}
+
+func ServerPage() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        render("Server", "server.html", w, r)
+	})
+}
+
+func DocsPage() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+        render("Docs", "docs.html", w, r)
+	})
+}
+
 func DashBoardPageHandler() http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -53,9 +83,10 @@ func DashBoardPageHandler() http.Handler {
 
 		if islogged == true {
 			log.Println("Username : ", user)
-			conditionsMap["Username"] = user
+			conditionsMap["Username"]  = user
+            conditionsMap["Dashboard"] = true
 
-            if err := frontend.ExecuteTemplate(w,"test.html", conditionsMap); err != nil {
+            if err := frontend.ExecuteTemplate(w,"dashboard.html", conditionsMap); err != nil {
                 log.Println(err)
             }
 
@@ -127,6 +158,7 @@ func MainHandler(w http.ResponseWriter, r *http.Request) {
 	if islogged == true {
 		log.Println("Username : ", user)
 		conditionsMap["Username"] = user
+		conditionsMap["Console"]  = true
 
         if err := frontend.ExecuteTemplate(w,"graphql.html", conditionsMap); err != nil {
             log.Println(err)
@@ -162,6 +194,8 @@ func (s *Server) Run(drv *driver.Controller) {
 	mux.Handle("/", DashBoardPageHandler())
 	mux.Handle("/console", http.HandlerFunc(MainHandler))
 	mux.Handle("/login", LoginPageHandler(r))
+	mux.Handle("/server", ServerPage())
+	mux.Handle("/docs", DocsPage())
 	mux.Handle("/logout", http.HandlerFunc(LogoutHandler))
 	mux.Handle("/query", authenticated(&relay.Handler{Schema: schema}))
 

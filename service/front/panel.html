@@ -59,25 +59,25 @@
           <div class="sidebar-sticky">
             <ul class="nav flex-column">
               <li class="nav-item">
-                <a class="nav-link active" href="/">
+                  {{if .Dashboard}} <a class="nav-link active" href="/"> {{else}} <a class="nav-link" href="/"> {{end}}
                   <span data-feather="home"></span>
-                  Dashboard <span class="sr-only">(current)</span>
+                  Dashboard  <span class="sr-only">(current)</span>
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/console">
+                  {{if .Console}} <a class="nav-link active" href="/console"> {{else}} <a class="nav-link" href="/console"> {{end}}
                   <span data-feather="code"></span>
                   Console
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/server">
+                  {{if .Server}} <a class="nav-link active" href="/server"> {{else}} <a class="nav-link" href="/server"> {{end}}
                   <span data-feather="server"></span>
                   Hardware
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/docs">
+                  {{if .Docs}} <a class="nav-link active" href="/docs"> {{else}} <a class="nav-link" href="/docs"> {{end}}
                   <span data-feather="book"></span>
                   Docs
                 </a>
