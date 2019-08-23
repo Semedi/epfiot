@@ -55,7 +55,7 @@ func DashBoardPageHandler() http.Handler {
 			log.Println("Username : ", user)
 			conditionsMap["Username"] = user
 
-            if err := frontend.ExecuteTemplate(w,"graphql.html", conditionsMap); err != nil {
+            if err := frontend.ExecuteTemplate(w,"test.html", conditionsMap); err != nil {
                 log.Println(err)
             }
 
@@ -160,8 +160,8 @@ func (s *Server) Run(drv *driver.Controller) {
 	mux := http.NewServeMux()
 
 	mux.Handle("/", DashBoardPageHandler())
+	mux.Handle("/console", http.HandlerFunc(MainHandler))
 	mux.Handle("/login", LoginPageHandler(r))
-	mux.Handle("/dashboard", http.HandlerFunc(MainHandler))
 	mux.Handle("/logout", http.HandlerFunc(LogoutHandler))
 	mux.Handle("/query", authenticated(&relay.Handler{Schema: schema}))
 
