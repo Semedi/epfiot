@@ -60,6 +60,12 @@ func render(cond string, file string, w http.ResponseWriter, r *http.Request) {
 
 }
 
+func ConsoleHandler() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		render("Console", "graphql.html", w, r)
+	})
+}
+
 func ServerPage() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		render("Server", "server.html", w, r)
@@ -73,26 +79,9 @@ func DocsPage() http.Handler {
 }
 
 func DashBoardPageHandler() http.Handler {
-
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-		conditionsMap := map[string]interface{}{}
-		islogged, user := Current(r)
-
-		if islogged == true {
-			log.Println("Username : ", user)
-			conditionsMap["Username"] = user
-			conditionsMap["Dashboard"] = true
-
-			if err := frontend.ExecuteTemplate(w, "dashboard.html", conditionsMap); err != nil {
-				log.Println(err)
-			}
-
-		} else {
-			http.Redirect(w, r, "/login", http.StatusForbidden)
-		}
+		render("Dashboard", "dashboard.html", w, r)
 	})
-
 }
 
 func LoginPageHandler(res *core.Resolver) http.Handler {
@@ -116,13 +105,6 @@ func LoginPageHandler(res *core.Resolver) http.Handler {
 				username := r.FormValue("Username")
 				password := r.FormValue("Password")
 
-				// NOTE: here is where you want to query your database to retrieve the hashed password
-				// for username.
-				// For this tutorial and simplicity sake, we will simulate the retrieved hashed password
-				// as $2a$10$4Yhs5bfGgp4vz7j6ScujKuhpRTA4l4OWg7oSukRbyRN7dc.C1pamu
-				// the plain password is 'mynakedpassword'
-				// see https://www.socketloop.com/tutorials/golang-bcrypting-password for more details
-				// on how to generate bcrypted password
 				hashedPasswordFromDatabase := []byte("$2a$10$4Yhs5bfGgp4vz7j6ScujKuhpRTA4l4OWg7oSukRbyRN7dc.C1pamu")
 				if err := bcrypt.CompareHashAndPassword(hashedPasswordFromDatabase, []byte(password)); err != nil {
 					log.Println("Either username or password is wrong")
@@ -143,27 +125,7 @@ func LoginPageHandler(res *core.Resolver) http.Handler {
 				log.Println(err)
 			}
 		}
-
 	})
-}
-
-func MainHandler(w http.ResponseWriter, r *http.Request) {
-	conditionsMap := map[string]interface{}{}
-
-	//read from session
-	islogged, user := Current(r)
-
-	if islogged == true {
-		log.Println("Username : ", user)
-		conditionsMap["Username"] = user
-		conditionsMap["Console"] = true
-
-		if err := frontend.ExecuteTemplate(w, "graphql.html", conditionsMap); err != nil {
-			log.Println(err)
-		}
-	} else {
-		http.Redirect(w, r, "/login", http.StatusForbidden)
-	}
 
 }
 
@@ -190,7 +152,7 @@ func (s *Server) Run(drv *driver.Controller) {
 	mux := http.NewServeMux()
 
 	mux.Handle("/", DashBoardPageHandler())
-	mux.Handle("/console", http.HandlerFunc(MainHandler))
+	mux.Handle("/console", ConsoleHandler())
 	mux.Handle("/login", LoginPageHandler(r))
 	mux.Handle("/server", ServerPage())
 	mux.Handle("/docs", DocsPage())
