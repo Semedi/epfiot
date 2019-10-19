@@ -1,12 +1,12 @@
 package driver
 
 import (
-	"log"
 	"fmt"
+	"log"
 
 	libvirt "github.com/libvirt/libvirt-go"
 	libvirtxml "github.com/libvirt/libvirt-go-xml"
-    "github.com/semedi/epfiot/core/model"
+	"github.com/semedi/epfiot/core/model"
 )
 
 type Libvirt struct {
@@ -60,10 +60,8 @@ func (l *Libvirt) Close() {
 	defer l.conn.Close()
 }
 
-
-
-func (l *Libvirt) get(query string) (bool, *libvirt.Domain){
-    doms := l.get_all()
+func (l *Libvirt) get(query string) (bool, *libvirt.Domain) {
+	doms := l.get_all()
 
 	for _, dom := range doms {
 		name, err := dom.GetName()
@@ -71,47 +69,50 @@ func (l *Libvirt) get(query string) (bool, *libvirt.Domain){
 			fmt.Printf("  %s\n", name)
 		}
 
-        if name == query{
-            return true, &dom
-        }
+		if name == query {
+			return true, &dom
+		}
 
 		dom.Free()
 	}
 
-    return false, nil
+	return false, nil
 }
 
-func (l *Libvirt) Destroy(query string) (error){
+func (l *Libvirt) Destroy(query string) error {
 
-    r, dom := l.get(query)
+	r, dom := l.get(query)
 
-    if  r == true{
+	if r == true {
 
-        info, err := dom.GetInfo()
+		info, err := dom.GetInfo()
 
-        if err != nil {
-            return err
-        }else {
+		if err != nil {
+			return err
+		} else {
 
-            //SHUTOFF
-            if info.State == 5{
-                err := dom.Undefine()
-                if err != nil { return err }
-            }
-            //RUNNING
-            if info.State == 1{
-                err := dom.Destroy()
-                if err != nil { return err }
-            }
-        }
-    }
+			//SHUTOFF
+			if info.State == 5 {
+				err := dom.Undefine()
+				if err != nil {
+					return err
+				}
+			}
+			//RUNNING
+			if info.State == 1 {
+				err := dom.Destroy()
+				if err != nil {
+					return err
+				}
+			}
+		}
+	}
 
-    return nil
+	return nil
 }
-
 
 // take care of free the c pointer after calling this method
-func (l *Libvirt) get_all()([]libvirt.Domain) {
+func (l *Libvirt) get_all() []libvirt.Domain {
 	da, err := l.conn.ListAllDomains(libvirt.CONNECT_LIST_DOMAINS_ACTIVE)
 	if err != nil {
 		panic(err)
@@ -122,11 +123,11 @@ func (l *Libvirt) get_all()([]libvirt.Domain) {
 		panic(err)
 	}
 
-    return append(da, di...)
+	return append(da, di...)
 }
 
 func (l *Libvirt) List() {
-    doms := l.get_all()
+	doms := l.get_all()
 
 	fmt.Printf("%d running domains:\n", len(doms))
 	for _, dom := range doms {
@@ -145,7 +146,7 @@ func (l *Libvirt) List() {
 //32: CONNECT_LIST_DOMAINS_PAUSED
 //64: CONNECT_LIST_DOMAINS_SHUTOFF
 func (l *Libvirt) Listt() {
-    l.List()
+	l.List()
 }
 
 //Source: &libvirtxml.DomainInterfaceSource{
@@ -161,14 +162,14 @@ func (l *Libvirt) Listt() {
 
 func setDevices(d *libvirtxml.Domain, ilocation string) {
 	d.Devices.Interfaces = []libvirtxml.DomainInterface{
-        {
-            Source: &libvirtxml.DomainInterfaceSource{
-                Bridge: &libvirtxml.DomainInterfaceSourceBridge{
-                    Bridge: "epfiot-net",
-                },
-		    },
-	    },
-    }
+		{
+			Source: &libvirtxml.DomainInterfaceSource{
+				Bridge: &libvirtxml.DomainInterfaceSourceBridge{
+					Bridge: "epfiot-net",
+				},
+			},
+		},
+	}
 
 	d.Devices.Disks = []libvirtxml.DomainDisk{
 		{
@@ -179,11 +180,11 @@ func setDevices(d *libvirtxml.Domain, ilocation string) {
 	}
 }
 func setMemory(d *libvirtxml.Domain, m int) {
-    d.Memory= &libvirtxml.DomainMemory{
-                Value:    (uint)(m),
-                Unit:     "MB",
-                DumpCore: "on",
-	        }
+	d.Memory = &libvirtxml.DomainMemory{
+		Value:    (uint)(m),
+		Unit:     "MB",
+		DumpCore: "on",
+	}
 }
 
 func (l *Libvirt) Create(vm model.Vm, uid uint) {
@@ -191,7 +192,7 @@ func (l *Libvirt) Create(vm model.Vm, uid uint) {
 
 	domcfg.Name = vm.Name
 	setDevices(&domcfg, Vmfile(uid, vm.Name))
-    setMemory(&domcfg, vm.Memory)
+	setMemory(&domcfg, vm.Memory)
 
 	xml, err := domcfg.Marshal()
 
@@ -208,4 +209,3 @@ func (l *Libvirt) Create(vm model.Vm, uid uint) {
 
 	fmt.Println(domain.GetName())
 }
-

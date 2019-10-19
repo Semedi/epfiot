@@ -1,11 +1,11 @@
 package core
 
 import (
-	"math/rand"
 	"github.com/jinzhu/gorm"
+	"math/rand"
 	// nolint: gotype
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
-    "github.com/semedi/epfiot/core/model"
+	"github.com/semedi/epfiot/core/model"
 )
 
 type DB struct {
@@ -72,9 +72,9 @@ func (db *DB) Find_user(username string) (*model.User, error) {
 		return nil, err
 	}
 
-    if user.Name == "" {
-        return nil, nil
-    }
+	if user.Name == "" {
+		return nil, nil
+	}
 
 	return &user, nil
 }
@@ -222,7 +222,7 @@ func (db *DB) deleteVm(userID, VmID uint) (*bool, error) {
 		return nil, err
 	}
 
-    res := true
+	res := true
 
 	return &res, err
 }
@@ -237,9 +237,9 @@ func (db *DB) addVm(input vmInput, userid uint) (*model.Vm, error) {
 
 	vm := model.Vm{
 		Name:    input.Name,
-        Base:    input.Base,
-        Memory:  (int)(input.Memory),
-        Vcpu:    (int)(input.Vcpu),
+		Base:    input.Base,
+		Memory:  (int)(input.Memory),
+		Vcpu:    (int)(input.Vcpu),
 		OwnerID: userid,
 		Tags:    t,
 	}

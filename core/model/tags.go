@@ -10,4 +10,3 @@ type Tag struct {
 	Title string
 	Vms   []Vm `gorm:"many2many:vm_tags"`
 }
-

@@ -8,21 +8,19 @@ import (
 	"strings"
 
 	graphql "github.com/graph-gophers/graphql-go"
-	"github.com/semedi/epfiot/driver"
 	"github.com/semedi/epfiot/core/model"
+	"github.com/semedi/epfiot/driver"
 )
 
-
 type Resolver struct {
-	Db *DB
-    Controller *driver.Controller
+	Db         *DB
+	Controller *driver.Controller
 }
-
 
 // GetUser resolves the getUser query
 func (r *Resolver) GetUser(ctx context.Context, args struct{ ID graphql.ID }) (*UserResolver, error) {
 
-    r.Controller.Handler.Init()
+	r.Controller.Handler.Init()
 
 	id, err := gqlIDToUint(args.ID)
 	if err != nil {
@@ -43,9 +41,9 @@ func (r *Resolver) GetUser(ctx context.Context, args struct{ ID graphql.ID }) (*
 }
 
 func (r *Resolver) GetVms(ctx context.Context) (*[]*VmResolver, error) {
-    id := ctx.Value("userid").(uint)
+	id := ctx.Value("userid").(uint)
 
-    vms, err := r.Db.GetUserVms(id)
+	vms, err := r.Db.GetUserVms(id)
 	if err != nil {
 		return nil, err
 	}
@@ -117,24 +115,24 @@ func (r *Resolver) GetTag(ctx context.Context, args struct{ Title string }) (*Ta
 type vmInput struct {
 	ID      *graphql.ID
 	OwnerID int32
-    Base    string
+	Base    string
 	Name    string
-    Memory  int32
-    Vcpu    int32
+	Memory  int32
+	Vcpu    int32
 	TagIDs  *[]*int32
 }
 
 // ddVm Resolves the createvm mutation
 func (r *Resolver) CreateVm(ctx context.Context, args struct{ Vm vmInput }) (*VmResolver, error) {
-    id := ctx.Value("userid").(uint)
+	id := ctx.Value("userid").(uint)
 
-    driver.Copy_base(args.Vm.Base, id, args.Vm.Name)
+	driver.Copy_base(args.Vm.Base, id, args.Vm.Name)
 
 	vm, err := r.Db.addVm(args.Vm, id)
 	if err != nil {
 		return nil, err
 	}
-    r.Controller.Handler.Create(*vm, id)
+	r.Controller.Handler.Create(*vm, id)
 
 	s := VmResolver{
 		db: r.Db,
@@ -295,13 +293,13 @@ func (p *VmResolver) Name(ctx context.Context) *string {
 
 // memory resolves the memory field for Vm
 func (p *VmResolver) Memory(ctx context.Context) *int32 {
-    r := int32(p.m.Memory)
+	r := int32(p.m.Memory)
 	return &r
 }
 
 // vcpu resolves the vcpu field for Vm
 func (p *VmResolver) Vcpu(ctx context.Context) *int32 {
-    r := int32(p.m.Vcpu)
+	r := int32(p.m.Vcpu)
 	return &r
 }
 

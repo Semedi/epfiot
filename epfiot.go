@@ -1,10 +1,11 @@
 package main
+
 import (
 	"github.com/semedi/epfiot/driver"
+	"github.com/semedi/epfiot/service"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
-    "github.com/semedi/epfiot/service"
 )
 
 type conf struct {
@@ -14,7 +15,7 @@ type conf struct {
 }
 
 func read_config() *conf {
-    config := new(conf)
+	config := new(conf)
 
 	yamlFile, err := ioutil.ReadFile("epfiot.conf")
 	if err != nil {
@@ -41,20 +42,15 @@ func (c conf) uri() string {
 }
 
 func main() {
-    config := read_config()
-    driver.Initfs("/storage")
+	config := read_config()
+	driver.Initfs("/storage")
 
-    server := service.New()
-    controller := driver.New(config.Driver ,config.uri())
+	server := service.New()
+	controller := driver.New(config.Driver, config.uri())
 
-    //controller.Handler.Destroy("polla")
+	//controller.Handler.Destroy("polla")
 
+	server.Run(controller)
 
-
-
-
-    server.Run(controller)
-
-
-    //controller.Start()
+	//controller.Start()
 }

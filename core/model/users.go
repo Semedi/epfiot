@@ -10,4 +10,3 @@ type User struct {
 	Name string
 	Vms  []Vm `gorm:"foreignkey:OwnerID"`
 }
-

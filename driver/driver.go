@@ -1,8 +1,8 @@
 package driver
 
 import (
-    "log"
-    "github.com/semedi/epfiot/core/model"
+	"github.com/semedi/epfiot/core/model"
+	"log"
 )
 
 type Driver interface {
@@ -10,30 +10,29 @@ type Driver interface {
 	Create(vm model.Vm, uid uint)
 	List()
 	Listt()
-    Destroy(query string) (error)
+	Destroy(query string) error
 	Close()
 }
 
 type Controller struct {
-    Handler Driver
+	Handler Driver
 }
 
-func New(d string, uri string) *Controller{
-    var drv Driver;
+func New(d string, uri string) *Controller {
+	var drv Driver
 	switch d {
-        case "kvm":
-            drv = New_kvm(uri)
-        default:
-            log.Fatalf("Unrecognized Driver")
+	case "kvm":
+		drv = New_kvm(uri)
+	default:
+		log.Fatalf("Unrecognized Driver")
 	}
 
-    c := &Controller{Handler: drv}
+	c := &Controller{Handler: drv}
 
-    c.Handler.Init()
+	c.Handler.Init()
 
-    return  c
+	return c
 }
-
 
 func (c *Controller) Start() {
 	c.Handler.Close()
