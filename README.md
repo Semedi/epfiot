@@ -5,7 +5,6 @@ Edge Provisioning for Internet of Things
 
 ---
 
-
 #### Appliance:
 
 - Alpine 3.9.2 (extended)
