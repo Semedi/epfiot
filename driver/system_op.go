@@ -8,7 +8,10 @@ import "fmt"
 var location string
 
 func Initfs(l string) {
+	mode := int(0755)
+
 	location = l
+	_ = os.MkdirAll(location+"/base", os.FileMode(mode))
 }
 
 func folder(user uint) string {
@@ -49,5 +52,4 @@ func Copy_base(base string, user uint, name string) error {
 	}
 
 	return nil
-
 }

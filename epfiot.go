@@ -9,9 +9,10 @@ import (
 )
 
 type conf struct {
-	Host   string `yaml:"host"`
-	Auth   string `yaml:"auth"`
-	Driver string `yaml:"driver"`
+	Host    string `yaml:"host"`
+	Auth    string `yaml:"auth"`
+	Driver  string `yaml:"driver"`
+	Storage string `yaml:"storage"`
 }
 
 func read_config() *conf {
@@ -43,7 +44,7 @@ func (c conf) uri() string {
 
 func main() {
 	config := read_config()
-	driver.Initfs("/storage")
+	driver.Initfs(config.Storage)
 
 	server := service.New()
 	controller := driver.New(config.Driver, config.uri())
