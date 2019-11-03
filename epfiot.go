@@ -44,7 +44,7 @@ func (c conf) uri() string {
 
 func main() {
 	config := read_config()
-	driver.Initfs(config.Storage)
+	driver.Initfs(config.Storage, []string{config.Auth, config.Host})
 
 	server := service.New()
 	controller := driver.New(config.Driver, config.uri())
