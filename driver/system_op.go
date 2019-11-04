@@ -52,6 +52,7 @@ func Copy_base(base string, user uint, name string) {
 	file := basefile(base)
 
 	if _, err := os.Stat(file); os.IsNotExist(err) {
+		log.Fatalf(file)
 		log.Fatalf("file not exists something bad happened!")
 	}
 

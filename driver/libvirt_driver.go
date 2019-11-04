@@ -171,6 +171,25 @@ func setDevices(d *libvirtxml.Domain, ilocation string) {
 		},
 	}
 
+	bus := uint(1)
+	dev := uint(8)
+
+	usb := &libvirtxml.DomainAddressUSB{
+		Bus:    &bus,
+		Port:   "2",
+		Device: &dev,
+	}
+
+	d.Devices.Hostdevs = []libvirtxml.DomainHostdev{
+		{
+			Managed: "yes",
+			SubsysUSB: &libvirtxml.DomainHostdevSubsysUSB{
+				Source: &libvirtxml.DomainHostdevSubsysUSBSource{
+					Address: usb},
+			},
+		},
+	}
+
 	d.Devices.Disks = []libvirtxml.DomainDisk{
 		{
 			Source: &libvirtxml.DomainDiskSource{File: &libvirtxml.DomainDiskSourceFile{File: ilocation}},
