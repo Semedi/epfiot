@@ -8,9 +8,9 @@ import (
 type Vm struct {
 	gorm.Model
 	OwnerID uint
-    Base    string
+	Base    string
 	Name    string
-    Memory  int
-    Vcpu    int
+	Memory  int
+	Vcpu    int
 	Tags    []Tag `gorm:"many2many:vms_tags"`
 }

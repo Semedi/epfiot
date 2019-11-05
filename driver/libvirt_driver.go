@@ -27,8 +27,11 @@ func New_kvm(c string) *Libvirt {
 	return l
 }
 
-func domain_def(vcpu int) libvirtxml.Domain {
+func domain_def(name string, vcpu int) libvirtxml.Domain {
+	nvram := fmt.Sprintf("/var/lib/libvirt/qemu/nvram/%s_uefi_VARS.fd", name)
+
 	domcfg := libvirtxml.Domain{
+		Name: name,
 		Type: "kvm",
 		OS: &libvirtxml.DomainOS{
 			Type: &libvirtxml.DomainOSType{
@@ -42,7 +45,7 @@ func domain_def(vcpu int) libvirtxml.Domain {
 				Readonly: "yes",
 			},
 			NVRam: &libvirtxml.DomainNVRam{
-				NVRam: "/var/lib/libvirt/qemu/nvram/ubuntu1804_uefi_VARS.fd",
+				NVRam: nvram,
 			},
 			BootDevices: []libvirtxml.DomainBootDevice{
 				{
@@ -175,7 +178,9 @@ func (l *Libvirt) Destroy(query string) error {
 
 	//SHUTOFF
 	if info.State == 5 {
-		err := dom.Undefine()
+
+		// delete nvram file
+		err := dom.UndefineFlags(4)
 		if err != nil {
 			return err
 		}
@@ -279,9 +284,8 @@ func setMemory(d *libvirtxml.Domain, m int) {
 }
 
 func (l *Libvirt) Create(vm model.Vm, uid uint) {
-	domcfg := domain_def(vm.Vcpu)
+	domcfg := domain_def(vm.Name, vm.Vcpu)
 
-	domcfg.Name = vm.Name
 	setDevices(&domcfg, Vmfile(uid, vm.Name))
 	setMemory(&domcfg, vm.Memory)
 
