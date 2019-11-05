@@ -4,6 +4,7 @@ import "os"
 import "os/exec"
 import "log"
 import "fmt"
+import "strings"
 
 var location string
 var connection []string
@@ -22,12 +23,14 @@ func execute(parameters ...string) {
 		parameters = append(connection, parameters...)
 	}
 
-	name, parameters := parameters[0], parameters[1:]
+	name, args := parameters[0], parameters[1:]
 
-	cmd := exec.Command(name, parameters...)
+	cmd := exec.Command(name, args...)
 	err := cmd.Run()
 
 	if err != nil {
+		msg := fmt.Sprintf("the next command has failed:\n   %s", strings.Join(parameters, " "))
+		fmt.Println(msg)
 		log.Fatalf("cmd.Run() failed with %s\n", err)
 	}
 }
