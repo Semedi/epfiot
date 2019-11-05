@@ -31,7 +31,29 @@ func domain_def(vcpu int) libvirtxml.Domain {
 		Type: "kvm",
 		OS: &libvirtxml.DomainOS{
 			Type: &libvirtxml.DomainOSType{
-				Type: "hvm",
+				Arch:    "x86_64",
+				Type:    "hvm",
+				Machine: "pc-q35-3.1",
+			},
+			Loader: &libvirtxml.DomainLoader{
+				Path:     "/usr/share/OVMF/OVMF_CODE.fd",
+				Type:     "pflash",
+				Readonly: "yes",
+			},
+			NVRam: &libvirtxml.DomainNVRam{
+				NVRam: "/var/lib/libvirt/qemu/nvram/ubuntu1804_uefi_VARS.fd",
+			},
+			BootDevices: []libvirtxml.DomainBootDevice{
+				{
+					Dev: "hd",
+				},
+			},
+		},
+		Features: &libvirtxml.DomainFeatureList{
+			ACPI: &libvirtxml.DomainFeature{},
+			APIC: &libvirtxml.DomainFeatureAPIC{},
+			VMPort: &libvirtxml.DomainFeatureState{
+				State: "off",
 			},
 		},
 		VCPU: &libvirtxml.DomainVCPU{
