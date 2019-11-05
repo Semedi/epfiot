@@ -194,11 +194,10 @@ func setDevices(d *libvirtxml.Domain, ilocation string) {
 	}
 
 	bus := uint(1)
-	dev := uint(8)
+	dev := uint(6)
 
 	usb := &libvirtxml.DomainAddressUSB{
 		Bus:    &bus,
-		Port:   "2",
 		Device: &dev,
 	}
 
