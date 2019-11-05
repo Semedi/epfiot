@@ -10,7 +10,9 @@ type Driver interface {
 	Create(vm model.Vm, uid uint)
 	List()
 	Listt()
+	Shutdown(query string) error
 	Destroy(query string) error
+	PowerOn(query string) error
 	Close()
 }
 

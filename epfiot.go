@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/semedi/epfiot/driver"
-	"github.com/semedi/epfiot/service"
+	//"github.com/semedi/epfiot/service"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
@@ -46,12 +46,14 @@ func main() {
 	config := read_config()
 	driver.Initfs(config.Storage, []string{config.Auth, config.Host})
 
-	server := service.New()
+	//server := service.New()
 	controller := driver.New(config.Driver, config.uri())
 
-	//controller.Handler.Destroy("polla")
+	controller.Handler.Destroy("polla")
+	//controller.Handler.Shutdown("polla")
+	//controller.Handler.PowerOn("polla")
 
-	server.Run(controller)
+	//server.Run(controller)
 
 	//controller.Start()
 }

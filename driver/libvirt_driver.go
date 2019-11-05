@@ -1,6 +1,7 @@
 package driver
 
 import (
+	"errors"
 	"fmt"
 	"log"
 
@@ -101,32 +102,82 @@ func (l *Libvirt) get(query string) (bool, *libvirt.Domain) {
 	return false, nil
 }
 
+func (l *Libvirt) PowerOn(query string) error {
+	r, dom := l.get(query)
+
+	if r != true {
+		return errors.New("vm does not exist")
+	}
+
+	Active, err := dom.IsActive()
+	if err != nil {
+		return err
+	}
+
+	if Active {
+		return errors.New("vm active")
+	}
+
+	err = dom.Create()
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (l *Libvirt) Shutdown(query string) error {
+	r, dom := l.get(query)
+
+	if r != true {
+		return errors.New("vm does not exist")
+	}
+	Active, err := dom.IsActive()
+	if err != nil {
+		return err
+	}
+
+	if !Active {
+		return errors.New("vm is not active")
+	}
+
+	err = dom.Shutdown()
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (l *Libvirt) Destroy(query string) error {
 
 	r, dom := l.get(query)
 
-	if r == true {
+	if r != true {
+		errors.New("domain not found!")
+	}
 
-		info, err := dom.GetInfo()
+	info, err := dom.GetInfo()
 
+	if err != nil {
+		return err
+	}
+
+	//RUNNING
+	if info.State == 1 {
+		err := dom.Destroy()
 		if err != nil {
 			return err
-		} else {
+		}
+	}
 
-			//SHUTOFF
-			if info.State == 5 {
-				err := dom.Undefine()
-				if err != nil {
-					return err
-				}
-			}
-			//RUNNING
-			if info.State == 1 {
-				err := dom.Destroy()
-				if err != nil {
-					return err
-				}
-			}
+	//SHUTOFF
+	if info.State == 5 {
+		err := dom.Undefine()
+		if err != nil {
+			return err
 		}
 	}
 
