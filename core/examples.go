@@ -25,12 +25,13 @@ var vms = []model.Vm{
 	//model.Vm{Name: "void", Base: "null", OwnerID: 3},
 }
 
-// Tags to be put in the database
-var tags = []model.Tag{
-	model.Tag{Title: "arm"},
-	model.Tag{Title: "amd64"},
+// Devices to be put in the database
+var hdevices = []model.Hostdev{
+	model.Hostdev{Bus: "4", Device: "1"},
+	model.Hostdev{Bus: "3", Device: "1"},
 }
 
-var tags2 = []model.Tag{
-	model.Tag{Title: "x86"},
+var hdevices2 = []model.Hostdev{
+	model.Hostdev{Bus: "1", Device: "1"},
+	model.Hostdev{Bus: "2", Device: "1"},
 }

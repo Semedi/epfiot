@@ -20,8 +20,8 @@ func NewDB(path string) (*DB, error) {
 	}
 
 	// drop tables and all data, and recreate them fresh for this run
-	db.DropTableIfExists(&model.User{}, &model.Vm{}, &model.Tag{})
-	db.AutoMigrate(&model.User{}, &model.Vm{}, &model.Tag{})
+	db.DropTableIfExists(&model.User{}, &model.Vm{}, &model.Hostdev{})
+	db.AutoMigrate(&model.User{}, &model.Vm{}, &model.Hostdev{})
 
 	// put all the users into the db
 	for _, u := range users {
@@ -30,8 +30,8 @@ func NewDB(path string) (*DB, error) {
 		}
 	}
 
-	var tg = []model.Tag{}
-	for _, t := range tags {
+	var tg = []model.Hostdev{}
+	for _, t := range hdevices {
 		if err := db.Create(&t).Error; err != nil {
 			return nil, err
 		}
@@ -39,8 +39,8 @@ func NewDB(path string) (*DB, error) {
 		tg = append(tg, t)
 	}
 
-	var tg2 = []model.Tag{}
-	for _, t := range tags2 {
+	var tg2 = []model.Hostdev{}
+	for _, t := range hdevices2 {
 		if err := db.Create(&t).Error; err != nil {
 			return nil, err
 		}
@@ -51,9 +51,9 @@ func NewDB(path string) (*DB, error) {
 	// put all the vms into the db
 	for i, p := range vms {
 		if i == 0 {
-			p.Tags = tg
+			p.Dev = tg
 		} else {
-			p.Tags = tg2
+			p.Dev = tg2
 		}
 		if err := db.Create(&p).Error; err != nil {
 			return nil, err
@@ -149,14 +149,14 @@ func (db *DB) getVmOwner(id int32) (*model.User, error) {
 	return &u, nil
 }
 
-func (db *DB) getVmTags(p *model.Vm) ([]model.Tag, error) {
-	var t []model.Tag
-	err := db.DB.Model(p).Related(&t, "Tags").Error
+func (db *DB) getVmDev(p *model.Vm) ([]model.Hostdev, error) {
+	var devices []model.Hostdev
+	err := db.DB.Model(p).Related(&devices).Error
 	if err != nil {
 		return nil, err
 	}
 
-	return t, nil
+	return devices, nil
 }
 
 func (db *DB) getVmsByID(ids []int, from, to int) ([]model.Vm, error) {
@@ -177,20 +177,20 @@ func (db *DB) updateVm(args *vmInput) (*model.Vm, error) {
 	}
 
 	// so the pointer dereference is safe
-	if args.TagIDs == nil {
+	if args.DevIDs == nil {
 		return nil, err
 	}
 
-	// if there are tags to be updated, go through that process
-	var newTags []model.Tag
-	if len(*args.TagIDs) > 0 {
-		err = db.DB.Where("id in (?)", args.TagIDs).Find(&newTags).Error
+	// if there are devices to be updated, go through that process
+	var newDevices []model.Hostdev
+	if len(*args.DevIDs) > 0 {
+		err = db.DB.Where("id in (?)", args.DevIDs).Find(&newDevices).Error
 		if err != nil {
 			return nil, err
 		}
 
-		// replace the old tag set with the new one
-		err = db.DB.Model(&p).Association("Tags").Replace(newTags).Error
+		// replace the devices set with the new one
+		err = db.DB.Model(&p).Association("Dev").Replace(newDevices).Error
 		if err != nil {
 			return nil, err
 		}
@@ -222,8 +222,8 @@ func (db *DB) deleteVm(userID, VmID uint) (*bool, error) {
 		return nil, err
 	}
 
-	// delete tags
-	err = db.DB.Model(&p).Association("Tags").Clear().Error
+	// delete devices
+	err = db.DB.Model(&p).Association("Dev").Clear().Error
 	if err != nil {
 		return nil, err
 	}
@@ -240,9 +240,9 @@ func (db *DB) deleteVm(userID, VmID uint) (*bool, error) {
 }
 
 func (db *DB) addVm(input vmInput, userid uint) (*model.Vm, error) {
-	// get the M2M relation tags from the DB and put them in the vm to be saved
-	var t []model.Tag
-	err := db.DB.Where("id in (?)", input.TagIDs).Find(&t).Error
+	// get relationed devices from the DB and put them in the vm to be saved
+	var devices []model.Hostdev
+	err := db.DB.Where("id in (?)", input.DevIDs).Find(&devices).Error
 	if err != nil {
 		return nil, err
 	}
@@ -253,7 +253,7 @@ func (db *DB) addVm(input vmInput, userid uint) (*model.Vm, error) {
 		Memory:  (int)(input.Memory),
 		Vcpu:    (int)(input.Vcpu),
 		OwnerID: userid,
-		Tags:    t,
+		Dev:     devices,
 	}
 
 	err = db.DB.Create(&vm).Error
@@ -265,24 +265,25 @@ func (db *DB) addVm(input vmInput, userid uint) (*model.Vm, error) {
 }
 
 // ###########################################################
-// TAGS:
+// DEVICES:
 // ###########################################################
-func (db *DB) getTagVms(t *model.Tag) ([]model.Vm, error) {
-	var p []model.Vm
-	err := db.DB.Model(t).Related(&p, "Vms").Error
+//func (db *DB) getTagVms(t *model.Tag) ([]model.Vm, error) {
+//	var p []model.Vm
+//	err := db.DB.Model(t).Related(&p, "Vms").Error
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	return p, nil
+//}
+
+func (db *DB) getDev(id uint) (*model.Hostdev, error) {
+	var d model.Hostdev
+
+	err := db.DB.First(&d, id).Error
 	if err != nil {
 		return nil, err
 	}
 
-	return p, nil
-}
-
-func (db *DB) getTagBytTitle(title string) (*model.Tag, error) {
-	var t model.Tag
-	err := db.DB.Where("title = ?", title).First(&t).Error
-	if err != nil {
-		return nil, err
-	}
-
-	return &t, nil
+	return &d, nil
 }

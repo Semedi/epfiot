@@ -96,16 +96,21 @@ func (r *Resolver) GetVm(args struct{ ID graphql.ID }) (*VmResolver, error) {
 	return &s, nil
 }
 
-// GetTag resolves the getTag query
-func (r *Resolver) GetTag(ctx context.Context, args struct{ Title string }) (*TagResolver, error) {
-	tag, err := r.Db.getTagBytTitle(args.Title)
+// GetDev resolves the getDev query
+func (r *Resolver) GetDev(ctx context.Context, args struct{ ID graphql.ID }) (*DevResolver, error) {
+	id, err := gqlIDToUint(args.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	s := TagResolver{
+	dev, err := r.Db.getDev(id)
+	if err != nil {
+		return nil, err
+	}
+
+	s := DevResolver{
 		db: r.Db,
-		m:  *tag,
+		m:  *dev,
 	}
 
 	return &s, nil
@@ -119,7 +124,7 @@ type vmInput struct {
 	Name    string
 	Memory  int32
 	Vcpu    int32
-	TagIDs  *[]*int32
+	DevIDs  *[]*int32
 }
 
 // ddVm Resolves the createvm mutation
@@ -226,39 +231,44 @@ func (u *UserResolver) Vms(ctx context.Context) (*[]*VmResolver, error) {
 	return &r, nil
 }
 
-// TagResolver contains the db and the Tag model for resolving
-type TagResolver struct {
+// DevResolver contains the db and the Hostdevice model for resolving
+type DevResolver struct {
 	db *DB
-	m  model.Tag
+	m  model.Hostdev
 }
 
-// ID resolves the ID for Tag
-func (t *TagResolver) ID(ctx context.Context) *graphql.ID {
-	return gqlIDP(t.m.ID)
+// ID resolves the ID for device
+func (d *DevResolver) ID(ctx context.Context) *graphql.ID {
+	return gqlIDP(d.m.ID)
 }
 
-// Title resolves the title field
-func (t *TagResolver) Title(ctx context.Context) *string {
-	return &t.m.Title
+// Bus resolves the bus field
+func (d *DevResolver) Bus(ctx context.Context) *string {
+	return &d.m.Bus
 }
 
-// Vms resolves the vmsvnoremap field
-func (t *TagResolver) Vms(ctx context.Context) (*[]*VmResolver, error) {
-	vms, err := t.db.getTagVms(&t.m)
-	if err != nil {
-		return nil, err
-	}
-
-	r := make([]*VmResolver, len(vms))
-	for i := range vms {
-		r[i] = &VmResolver{
-			db: t.db,
-			m:  vms[i],
-		}
-	}
-
-	return &r, nil
+// Device resolves the device field
+func (d *DevResolver) Device(ctx context.Context) *string {
+	return &d.m.Device
 }
+
+//// Vms resolves the vmsvnoremap field
+//func (t *DevResolver) Vms(ctx context.Context) (*[]*VmResolver, error) {
+//	vms, err := t.db.getTagVms(&t.m)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	r := make([]*VmResolver, len(vms))
+//	for i := range vms {
+//		r[i] = &VmResolver{
+//			db: t.db,
+//			m:  vms[i],
+//		}
+//	}
+//
+//	return &r, nil
+//}
 
 // VmResolver contains the DB and the model for resolving
 type VmResolver struct {
@@ -308,18 +318,18 @@ func (p *VmResolver) Base(ctx context.Context) *string {
 	return &p.m.Base
 }
 
-// Tags resolves the vm tags
-func (p *VmResolver) Tags(ctx context.Context) (*[]*TagResolver, error) {
-	tags, err := p.db.getVmTags(&p.m)
+// Dev resolves the vm devices
+func (p *VmResolver) Dev(ctx context.Context) (*[]*DevResolver, error) {
+	devices, err := p.db.getVmDev(&p.m)
 	if err != nil {
 		return nil, err
 	}
 
-	r := make([]*TagResolver, len(tags))
-	for i := range tags {
-		r[i] = &TagResolver{
+	r := make([]*DevResolver, len(devices))
+	for i := range devices {
+		r[i] = &DevResolver{
 			db: p.db,
-			m:  tags[i],
+			m:  devices[i],
 		}
 	}
 
