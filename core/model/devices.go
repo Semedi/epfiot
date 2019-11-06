@@ -9,5 +9,6 @@ type Hostdev struct {
 	gorm.Model
 	Bus    string
 	Device string
+	Info   string
 	VmID   uint
 }

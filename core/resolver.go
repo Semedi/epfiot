@@ -252,6 +252,11 @@ func (d *DevResolver) Device(ctx context.Context) *string {
 	return &d.m.Device
 }
 
+// Info resolves the info field
+func (d *DevResolver) Info(ctx context.Context) *string {
+	return &d.m.Info
+}
+
 //// Vms resolves the vmsvnoremap field
 //func (t *DevResolver) Vms(ctx context.Context) (*[]*VmResolver, error) {
 //	vms, err := t.db.getTagVms(&t.m)

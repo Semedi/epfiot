@@ -35,6 +35,7 @@ type Hostdev {
   id: ID
   bus: String
   device: String
+  info  : String
 }
 
 "what is needed for a user"
