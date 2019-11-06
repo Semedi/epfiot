@@ -294,7 +294,7 @@ func (db *DB) addVm(input vmInput, userid uint) (*model.Vm, error) {
 
 	var things []model.Thing
 	if input.ThingIDs != nil {
-		err = db.DB.Where("id in (?)", *input.ThingIDs).Find(&things).Error
+		err := db.DB.Where("id in (?)", *input.ThingIDs).Find(&things).Error
 		if err != nil {
 			return nil, err
 		}
@@ -310,7 +310,7 @@ func (db *DB) addVm(input vmInput, userid uint) (*model.Vm, error) {
 		Things:  things,
 	}
 
-	err = db.DB.Create(&vm).Error
+	err := db.DB.Create(&vm).Error
 	if err != nil {
 		return nil, err
 	}
