@@ -28,6 +28,9 @@ func New_kvm(c string) *Libvirt {
 	return l
 }
 
+//TODO:
+//	make nvram uefi paths configurable
+//	make Machine type (pc-q35) configurable
 func domain_def(name string, vcpu int) libvirtxml.Domain {
 	nvram := fmt.Sprintf("/var/lib/libvirt/qemu/nvram/%s_uefi_VARS.fd", name)
 
