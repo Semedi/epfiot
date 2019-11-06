@@ -8,5 +8,5 @@ import (
 type Tag struct {
 	gorm.Model
 	Title string
-	Vms   []Vm `gorm:"many2many:vm_tags"`
+	VmID  uint
 }

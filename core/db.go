@@ -2,7 +2,6 @@ package core
 
 import (
 	"github.com/jinzhu/gorm"
-	"math/rand"
 	// nolint: gotype
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/semedi/epfiot/core/model"
@@ -40,9 +39,22 @@ func NewDB(path string) (*DB, error) {
 		tg = append(tg, t)
 	}
 
+	var tg2 = []model.Tag{}
+	for _, t := range tags2 {
+		if err := db.Create(&t).Error; err != nil {
+			return nil, err
+		}
+
+		tg2 = append(tg2, t)
+	}
+
 	// put all the vms into the db
-	for _, p := range vms {
-		p.Tags = tg[:rand.Intn(5)]
+	for i, p := range vms {
+		if i == 0 {
+			p.Tags = tg
+		} else {
+			p.Tags = tg2
+		}
 		if err := db.Create(&p).Error; err != nil {
 			return nil, err
 		}
