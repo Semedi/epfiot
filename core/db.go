@@ -20,8 +20,8 @@ func NewDB(path string) (*DB, error) {
 	}
 
 	// drop tables and all data, and recreate them fresh for this run
-	db.DropTableIfExists(&model.User{}, &model.Vm{}, &model.Hostdev{})
-	db.AutoMigrate(&model.User{}, &model.Vm{}, &model.Hostdev{})
+	db.DropTableIfExists(&model.User{}, &model.Vm{}, &model.Hostdev{}, &model.Thing{})
+	db.AutoMigrate(&model.User{}, &model.Vm{}, &model.Hostdev{}, &model.Thing{})
 
 	// put all the users into the db
 	for _, u := range users {
@@ -30,31 +30,37 @@ func NewDB(path string) (*DB, error) {
 		}
 	}
 
-	var tg = []model.Hostdev{}
+	//var tg = []model.Hostdev{}
 	for _, t := range hdevices {
 		if err := db.Create(&t).Error; err != nil {
 			return nil, err
 		}
 
-		tg = append(tg, t)
+		//tg = append(tg, t)
 	}
 
-	var tg2 = []model.Hostdev{}
+	//var tg2 = []model.Hostdev{}
 	for _, t := range hdevices2 {
 		if err := db.Create(&t).Error; err != nil {
 			return nil, err
 		}
 
-		tg2 = append(tg2, t)
+		//tg2 = append(tg2, t)
+	}
+
+	for _, t := range things {
+		if err := db.Create(&t).Error; err != nil {
+			return nil, err
+		}
 	}
 
 	// put all the vms into the db
-	for i, p := range vms {
-		if i == 0 {
-			p.Dev = tg
-		} else {
-			p.Dev = tg2
-		}
+	for _, p := range vms {
+		//if i == 0 {
+		//	p.Dev = tg
+		//} else {
+		//	p.Dev = tg2
+		//}
 		if err := db.Create(&p).Error; err != nil {
 			return nil, err
 		}
@@ -159,6 +165,16 @@ func (db *DB) getVmDev(p *model.Vm) ([]model.Hostdev, error) {
 	return devices, nil
 }
 
+func (db *DB) getVmThings(p *model.Vm) ([]model.Thing, error) {
+	var things []model.Thing
+	err := db.DB.Model(p).Related(&things).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return things, nil
+}
+
 func (db *DB) getVmsByID(ids []int, from, to int) ([]model.Vm, error) {
 	var p []model.Vm
 	err := db.DB.Where("id in (?)", ids[from:to]).Find(&p).Error
@@ -196,6 +212,26 @@ func (db *DB) updateVm(args *vmInput) (*model.Vm, error) {
 		}
 	}
 
+	// so the pointer dereference is safe
+	if args.ThingIDs == nil {
+		return nil, err
+	}
+
+	// if there are things to be updated, go through that process
+	var newThings []model.Thing
+	if len(*args.ThingIDs) > 0 {
+		err = db.DB.Where("id in (?)", args.ThingIDs).Find(&newThings).Error
+		if err != nil {
+			return nil, err
+		}
+
+		// replace the things set with the new one
+		err = db.DB.Model(&p).Association("Things").Replace(newThings).Error
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	updated := model.Vm{
 		Name:    args.Name,
 		OwnerID: uint(args.OwnerID),
@@ -228,6 +264,12 @@ func (db *DB) deleteVm(userID, VmID uint) (*bool, error) {
 		return nil, err
 	}
 
+	// delete Things
+	err = db.DB.Model(&p).Association("Things").Clear().Error
+	if err != nil {
+		return nil, err
+	}
+
 	// delete record
 	err = db.DB.Delete(&p).Error
 	if err != nil {
@@ -247,6 +289,12 @@ func (db *DB) addVm(input vmInput, userid uint) (*model.Vm, error) {
 		return nil, err
 	}
 
+	var things []model.Thing
+	err = db.DB.Where("id in (?)", input.ThingIDs).Find(&things).Error
+	if err != nil {
+		return nil, err
+	}
+
 	vm := model.Vm{
 		Name:    input.Name,
 		Base:    input.Base,
@@ -254,6 +302,7 @@ func (db *DB) addVm(input vmInput, userid uint) (*model.Vm, error) {
 		Vcpu:    (int)(input.Vcpu),
 		OwnerID: userid,
 		Dev:     devices,
+		Things:  things,
 	}
 
 	err = db.DB.Create(&vm).Error
@@ -267,6 +316,7 @@ func (db *DB) addVm(input vmInput, userid uint) (*model.Vm, error) {
 // ###########################################################
 // DEVICES:
 // ###########################################################
+
 //func (db *DB) getTagVms(t *model.Tag) ([]model.Vm, error) {
 //	var p []model.Vm
 //	err := db.DB.Model(t).Related(&p, "Vms").Error
@@ -286,4 +336,18 @@ func (db *DB) getDev(id uint) (*model.Hostdev, error) {
 	}
 
 	return &d, nil
+}
+
+// ###########################################################
+// THINGS:
+// ###########################################################
+func (db *DB) getThing(id uint) (*model.Thing, error) {
+	var t model.Thing
+
+	err := db.DB.First(&t, id).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &t, nil
 }

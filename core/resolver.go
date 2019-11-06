@@ -116,15 +116,35 @@ func (r *Resolver) GetDev(ctx context.Context, args struct{ ID graphql.ID }) (*D
 	return &s, nil
 }
 
+func (r *Resolver) GetThing(ctx context.Context, args struct{ ID graphql.ID }) (*ThingResolver, error) {
+	id, err := gqlIDToUint(args.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	thing, err := r.Db.getThing(id)
+	if err != nil {
+		return nil, err
+	}
+
+	s := ThingResolver{
+		db: r.Db,
+		m:  *thing,
+	}
+
+	return &s, nil
+}
+
 // vmInput has everything needed to do adds and updates on a vm
 type vmInput struct {
-	ID      *graphql.ID
-	OwnerID int32
-	Base    string
-	Name    string
-	Memory  int32
-	Vcpu    int32
-	DevIDs  *[]*int32
+	ID       *graphql.ID
+	OwnerID  int32
+	Base     string
+	Name     string
+	Memory   int32
+	Vcpu     int32
+	DevIDs   *[]*int32
+	ThingIDs *[]*int32
 }
 
 // ddVm Resolves the createvm mutation
@@ -257,6 +277,26 @@ func (d *DevResolver) Info(ctx context.Context) *string {
 	return &d.m.Info
 }
 
+type ThingResolver struct {
+	db *DB
+	m  model.Thing
+}
+
+// ID resolves the ID for Thing
+func (t *ThingResolver) ID(ctx context.Context) *graphql.ID {
+	return gqlIDP(t.m.ID)
+}
+
+// Name resolves the name field
+func (t *ThingResolver) Name(ctx context.Context) *string {
+	return &t.m.Name
+}
+
+// Info resolves the info field
+func (t *ThingResolver) Info(ctx context.Context) *string {
+	return &t.m.Info
+}
+
 //// Vms resolves the vmsvnoremap field
 //func (t *DevResolver) Vms(ctx context.Context) (*[]*VmResolver, error) {
 //	vms, err := t.db.getTagVms(&t.m)
@@ -335,6 +375,23 @@ func (p *VmResolver) Dev(ctx context.Context) (*[]*DevResolver, error) {
 		r[i] = &DevResolver{
 			db: p.db,
 			m:  devices[i],
+		}
+	}
+
+	return &r, nil
+}
+
+func (p *VmResolver) Things(ctx context.Context) (*[]*ThingResolver, error) {
+	things, err := p.db.getVmThings(&p.m)
+	if err != nil {
+		return nil, err
+	}
+
+	r := make([]*ThingResolver, len(things))
+	for i := range things {
+		r[i] = &ThingResolver{
+			db: p.db,
+			m:  things[i],
 		}
 	}
 

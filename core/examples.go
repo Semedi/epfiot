@@ -27,3 +27,7 @@ var hdevices2 = []model.Hostdev{
 	model.Hostdev{Bus: "1", Device: "1", Info: "usb"},
 	model.Hostdev{Bus: "2", Device: "1", Info: "usb"},
 }
+
+var things = []model.Thing{
+	model.Thing{Name: "test", Info: "sensor"},
+}

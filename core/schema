@@ -9,6 +9,7 @@ type Query {
   getUsers(): [User]
   getVm(id: ID!): Vm
   getDev(id: ID!): Hostdev
+  getThing(id: ID!): Thing
   getVms(): [Vm]
 }
 
@@ -28,6 +29,7 @@ type Vm {
   vcpu: Int
   memory: Int
   dev: [Hostdev]
+  things: [Thing]
 }
 
 "Hostdev has everything needed for a host device"
@@ -36,6 +38,12 @@ type Hostdev {
   bus: String
   device: String
   info  : String
+}
+
+type Thing {
+  id: ID
+  name: String
+  info: String
 }
 
 "what is needed for a user"
@@ -75,5 +83,6 @@ input VmInput {
   name: String!
   memory: Int = 256
   vcpu:   Int = 1
-  DevIDs: [Int]
+  devIDs: [Int]
+  thingIDs: [Int]
 }
