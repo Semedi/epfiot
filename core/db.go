@@ -200,7 +200,7 @@ func (db *DB) updateVm(args *vmInput) (*model.Vm, error) {
 	// if there are devices to be updated, go through that process
 	var newDevices []model.Hostdev
 	if len(*args.DevIDs) > 0 {
-		err = db.DB.Where("id in (?)", args.DevIDs).Find(&newDevices).Error
+		err = db.DB.Where("id in (?)", *args.DevIDs).Find(&newDevices).Error
 		if err != nil {
 			return nil, err
 		}
@@ -220,7 +220,7 @@ func (db *DB) updateVm(args *vmInput) (*model.Vm, error) {
 	// if there are things to be updated, go through that process
 	var newThings []model.Thing
 	if len(*args.ThingIDs) > 0 {
-		err = db.DB.Where("id in (?)", args.ThingIDs).Find(&newThings).Error
+		err = db.DB.Where("id in (?)", *args.ThingIDs).Find(&newThings).Error
 		if err != nil {
 			return nil, err
 		}
@@ -284,15 +284,20 @@ func (db *DB) deleteVm(userID, VmID uint) (*bool, error) {
 func (db *DB) addVm(input vmInput, userid uint) (*model.Vm, error) {
 	// get relationed devices from the DB and put them in the vm to be saved
 	var devices []model.Hostdev
-	err := db.DB.Where("id in (?)", input.DevIDs).Find(&devices).Error
-	if err != nil {
-		return nil, err
+
+	if input.DevIDs != nil {
+		err := db.DB.Where("id in (?)", *input.DevIDs).Find(&devices).Error
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	var things []model.Thing
-	err = db.DB.Where("id in (?)", input.ThingIDs).Find(&things).Error
-	if err != nil {
-		return nil, err
+	if input.ThingIDs != nil {
+		err = db.DB.Where("id in (?)", *input.ThingIDs).Find(&things).Error
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	vm := model.Vm{
