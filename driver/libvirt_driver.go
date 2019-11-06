@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"strconv"
 
 	libvirt "github.com/libvirt/libvirt-go"
 	libvirtxml "github.com/libvirt/libvirt-go-xml"
@@ -227,18 +228,7 @@ func (l *Libvirt) Listt() {
 	l.List()
 }
 
-//Source: &libvirtxml.DomainInterfaceSource{
-//    Bridge: &libvirtxml.DomainInterfaceSourceBridge{
-//        Bridge: "epfiot-net",
-//    },
-//},
-//Source: &libvirtxml.DomainInterfaceSource{
-//	Network: &libvirtxml.DomainInterfaceSourceNetwork{
-//		Network: "epfiot-vm",
-//	},
-//},
-
-func setDevices(d *libvirtxml.Domain, ilocation string) {
+func setDevices(d *libvirtxml.Domain, ilocation string, vm model.Vm) {
 	d.Devices.Interfaces = []libvirtxml.DomainInterface{
 		{
 			Source: &libvirtxml.DomainInterfaceSource{
@@ -249,22 +239,30 @@ func setDevices(d *libvirtxml.Domain, ilocation string) {
 		},
 	}
 
-	bus := uint(1)
-	dev := uint(6)
+	if vm.Dev != nil {
 
-	usb := &libvirtxml.DomainAddressUSB{
-		Bus:    &bus,
-		Device: &dev,
-	}
+		d.Devices.Hostdevs = []libvirtxml.DomainHostdev{}
+		for _, hdev := range vm.Dev {
+			bus, _ := strconv.ParseUint(hdev.Bus, 10, 32)
+			dev, _ := strconv.ParseUint(hdev.Device, 10, 32)
 
-	d.Devices.Hostdevs = []libvirtxml.DomainHostdev{
-		{
-			Managed: "yes",
-			SubsysUSB: &libvirtxml.DomainHostdevSubsysUSB{
-				Source: &libvirtxml.DomainHostdevSubsysUSBSource{
-					Address: usb},
-			},
-		},
+			ubus := uint(bus)
+			udev := uint(dev)
+
+			usb := &libvirtxml.DomainAddressUSB{
+				Bus:    &ubus,
+				Device: &udev,
+			}
+
+			d.Devices.Hostdevs = append(d.Devices.Hostdevs, libvirtxml.DomainHostdev{
+				Managed: "yes",
+				SubsysUSB: &libvirtxml.DomainHostdevSubsysUSB{
+					Source: &libvirtxml.DomainHostdevSubsysUSBSource{
+						Address: usb},
+				},
+			})
+
+		}
 	}
 
 	d.Devices.Disks = []libvirtxml.DomainDisk{
@@ -275,6 +273,7 @@ func setDevices(d *libvirtxml.Domain, ilocation string) {
 		},
 	}
 }
+
 func setMemory(d *libvirtxml.Domain, m int) {
 	d.Memory = &libvirtxml.DomainMemory{
 		Value:    (uint)(m),
@@ -286,7 +285,7 @@ func setMemory(d *libvirtxml.Domain, m int) {
 func (l *Libvirt) Create(vm model.Vm, uid uint) {
 	domcfg := domain_def(vm.Name, vm.Vcpu)
 
-	setDevices(&domcfg, Vmfile(uid, vm.Name))
+	setDevices(&domcfg, Vmfile(uid, vm.Name), vm)
 	setMemory(&domcfg, vm.Memory)
 
 	xml, err := domcfg.Marshal()

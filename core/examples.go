@@ -19,8 +19,8 @@ var vms = []model.Vm{
 
 // Devices to be put in the database
 var hdevices = []model.Hostdev{
-	model.Hostdev{Bus: "4", Device: "1", Info: "usb"},
-	model.Hostdev{Bus: "3", Device: "1", Info: "usb"},
+	model.Hostdev{Bus: "1", Device: "3", Info: "usb"},
+	model.Hostdev{Bus: "1", Device: "9", Info: "usb"},
 }
 
 var hdevices2 = []model.Hostdev{
