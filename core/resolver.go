@@ -165,6 +165,12 @@ type vmInput struct {
 	ThingIDs *[]*int32
 }
 
+type thingInput struct {
+	ID   *graphql.ID
+	Name string
+	Info string
+}
+
 // ddVm Resolves the createvm mutation
 func (r *Resolver) CreateVm(ctx context.Context, args struct{ Vm vmInput }) (*VmResolver, error) {
 	id := ctx.Value("userid").(uint)
@@ -213,6 +219,21 @@ func (r *Resolver) DeleteVm(args struct{ UserID, VmID graphql.ID }) (*bool, erro
 	}
 
 	return r.Db.deleteVm(userID, vmID)
+}
+
+func (r *Resolver) CreateThing(ctx context.Context, args struct{ Thing thingInput }) (*ThingResolver, error) {
+	t, err := r.Db.AddThing(args.Thing)
+
+	if err != nil {
+		return nil, err
+	}
+
+	s := ThingResolver{
+		db: r.Db,
+		m:  *t,
+	}
+
+	return &s, nil
 }
 
 // encode cursor encodes the cursot position in base64

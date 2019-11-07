@@ -363,3 +363,17 @@ func (db *DB) getThing(id uint) (*model.Thing, error) {
 
 	return &t, nil
 }
+
+func (db *DB) AddThing(input thingInput) (*model.Thing, error) {
+	thing := model.Thing{
+		Name: input.Name,
+		Info: input.Info,
+	}
+
+	err := db.DB.Create(&thing).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &thing, nil
+}

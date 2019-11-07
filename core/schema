@@ -19,6 +19,7 @@ type Mutation {
   createVm(vm: VmInput!): Vm
   updateVm(vm: VmInput!): Vm
   deleteVm(userID: ID!, vmID: ID!): Boolean
+  createThing(thing: ThingInput!): Thing
 }
 
 "what is needed for a vm"
@@ -86,4 +87,10 @@ input VmInput {
   vcpu:   Int = 1
   devIDs: [Int]
   thingIDs: [Int]
+}
+
+input ThingInput {
+  id: ID
+  name: String!
+  info: String!
 }
