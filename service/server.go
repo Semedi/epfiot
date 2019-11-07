@@ -21,9 +21,10 @@ var frontend *template.Template
 
 type Server struct {
 	db *core.DB
+	c  *driver.Controller
 }
 
-func New() *Server {
+func New(drv *driver.Controller) *Server {
 	var r error
 	frontend, r = template.ParseGlob("service/front/*.html")
 	if r != nil {
@@ -38,6 +39,7 @@ func New() *Server {
 	}
 
 	s.db = database
+	s.c = drv
 
 	return s
 }
@@ -135,7 +137,7 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/login", http.StatusFound)
 }
 
-func (s *Server) Run(drv *driver.Controller) {
+func (s *Server) Run() {
 
 	fileschema, err := ioutil.ReadFile("core/schema")
 
@@ -146,7 +148,7 @@ func (s *Server) Run(drv *driver.Controller) {
 	}
 
 	database := s.db
-	r := &core.Resolver{Db: database, Controller: drv}
+	r := &core.Resolver{Db: database, Controller: s.c}
 
 	schema := graphql.MustParseSchema(string(fileschema), r, graphql.UseStringDescriptions())
 

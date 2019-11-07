@@ -46,14 +46,14 @@ func main() {
 	config := read_config()
 	driver.Initfs(config.Storage, []string{config.Auth, config.Host})
 
-	server := service.New()
 	controller := driver.New(config.Driver, config.uri())
+	server := service.New(controller)
 
 	//controller.Handler.Destroy("polla")
 	//controller.Handler.Shutdown("polla")
 	//controller.Handler.PowerOn("polla")
 
-	server.Run(controller)
+	server.Run()
 
 	//controller.Start()
 }
