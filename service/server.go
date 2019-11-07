@@ -136,6 +136,7 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) Run(drv *driver.Controller) {
+
 	fileschema, err := ioutil.ReadFile("core/schema")
 
 	fs := http.FileServer(http.Dir("service/front/static"))

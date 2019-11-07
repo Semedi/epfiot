@@ -5,6 +5,7 @@ import "os/exec"
 import "log"
 import "fmt"
 import "strings"
+import "bufio"
 
 var location string
 var connection []string
@@ -17,7 +18,25 @@ func Initfs(l string, auth_host []string) {
 	_ = os.MkdirAll(location+"/base", os.FileMode(mode))
 }
 
-func execute(parameters ...string) {
+func Usb_info() [][]string {
+	info := execute("lsusb")
+	scanner := bufio.NewScanner(strings.NewReader(info))
+
+	a := [][]string{}
+	for scanner.Scan() {
+		columns := strings.Fields(strings.Replace(scanner.Text(), ":", "", -1))
+		bus := strings.TrimLeft(columns[1], "0")
+		dev := strings.TrimLeft(columns[3], "0")
+		info := strings.Join(columns[6:], " ")
+
+		hdevice_info := []string{bus, dev, info}
+		a = append(a, hdevice_info)
+	}
+
+	return a
+}
+
+func execute(parameters ...string) string {
 
 	if connection != nil {
 		parameters = append(connection, parameters...)
@@ -25,14 +44,14 @@ func execute(parameters ...string) {
 
 	name, args := parameters[0], parameters[1:]
 
-	cmd := exec.Command(name, args...)
-	err := cmd.Run()
-
+	out, err := exec.Command(name, args...).Output()
 	if err != nil {
 		msg := fmt.Sprintf("the next command has failed:\n   %s", strings.Join(parameters, " "))
 		fmt.Println(msg)
-		log.Fatalf("cmd.Run() failed with %s\n", err)
+		log.Fatal(err)
 	}
+
+	return string(out)
 }
 
 func folder(user uint) string {
