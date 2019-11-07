@@ -128,6 +128,16 @@ func (db *DB) GetUserVms(id uint) ([]model.Vm, error) {
 	return p, nil
 }
 
+func (db *DB) getHostdevices() ([]model.Hostdev, error) {
+	var devices []model.Hostdev
+	err := db.DB.Find(&devices).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return devices, nil
+}
+
 // ###########################################################
 // VMS:
 // ###########################################################

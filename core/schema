@@ -11,6 +11,7 @@ type Query {
   getDev(id: ID!): Hostdev
   getThing(id: ID!): Thing
   getVms(): [Vm]
+  getUsb(): [Hostdev]
 }
 
 "The mutation type, represents all updates we can make to our data"

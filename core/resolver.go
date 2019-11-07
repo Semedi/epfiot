@@ -59,6 +59,24 @@ func (r *Resolver) GetVms(ctx context.Context) (*[]*VmResolver, error) {
 	return &v, nil
 }
 
+func (r *Resolver) GetUsb(ctx context.Context) (*[]*DevResolver, error) {
+
+	devs, err := r.Db.getHostdevices()
+	if err != nil {
+		return nil, err
+	}
+
+	d := make([]*DevResolver, len(devs))
+	for i := range devs {
+		d[i] = &DevResolver{
+			db: r.Db,
+			m:  devs[i],
+		}
+	}
+
+	return &d, nil
+}
+
 func (r *Resolver) GetUsers(ctx context.Context) (*[]*UserResolver, error) {
 	users, err := r.Db.getUsers()
 	if err != nil {
