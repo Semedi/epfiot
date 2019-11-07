@@ -30,24 +30,6 @@ func NewDB(path string) (*DB, error) {
 		}
 	}
 
-	//var tg = []model.Hostdev{}
-	for _, t := range hdevices {
-		if err := db.Create(&t).Error; err != nil {
-			return nil, err
-		}
-
-		//tg = append(tg, t)
-	}
-
-	//var tg2 = []model.Hostdev{}
-	for _, t := range hdevices2 {
-		if err := db.Create(&t).Error; err != nil {
-			return nil, err
-		}
-
-		//tg2 = append(tg2, t)
-	}
-
 	for _, t := range things {
 		if err := db.Create(&t).Error; err != nil {
 			return nil, err
@@ -56,17 +38,32 @@ func NewDB(path string) (*DB, error) {
 
 	// put all the vms into the db
 	for _, p := range vms {
-		//if i == 0 {
-		//	p.Dev = tg
-		//} else {
-		//	p.Dev = tg2
-		//}
 		if err := db.Create(&p).Error; err != nil {
 			return nil, err
 		}
 	}
 
 	return &DB{db}, nil
+}
+
+func (db *DB) CreateHostdevs(devices_str [][]string) error {
+	BUS := 0
+	DEV := 1
+	INFO := 2
+
+	for _, d := range devices_str {
+		hdev := model.Hostdev{
+			Bus:    d[BUS],
+			Device: d[DEV],
+			Info:   d[INFO],
+		}
+
+		if err := db.DB.Create(&hdev).Error; err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // ###########################################################

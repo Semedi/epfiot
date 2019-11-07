@@ -17,17 +17,6 @@ var vms = []model.Vm{
 	model.Vm{Name: "ubuntu", Base: "null", OwnerID: 2},
 }
 
-// Devices to be put in the database
-var hdevices = []model.Hostdev{
-	model.Hostdev{Bus: "1", Device: "3", Info: "usb"},
-	model.Hostdev{Bus: "1", Device: "9", Info: "usb"},
-}
-
-var hdevices2 = []model.Hostdev{
-	model.Hostdev{Bus: "1", Device: "1", Info: "usb"},
-	model.Hostdev{Bus: "2", Device: "1", Info: "usb"},
-}
-
 var things = []model.Thing{
 	model.Thing{Name: "test", Info: "sensor"},
 }

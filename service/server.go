@@ -38,6 +38,11 @@ func New(drv *driver.Controller) *Server {
 		panic(err)
 	}
 
+	err = database.CreateHostdevs(driver.Usb_info())
+	if err != nil {
+		panic(err)
+	}
+
 	s.db = database
 	s.c = drv
 
