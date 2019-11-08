@@ -20,6 +20,7 @@ type Mutation {
   updateVm(vm: VmInput!): Vm
   deleteVm(userID: ID!, vmID: ID!): Boolean
   createThing(thing: ThingInput!): Thing
+  createThingVm(thing: ThingInput!, vmID: ID!): Thing
 }
 
 "what is needed for a vm"

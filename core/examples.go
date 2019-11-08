@@ -13,8 +13,8 @@ var users = []model.User{
 // ID's 1, 2, 3
 
 var vms = []model.Vm{
-	model.Vm{Name: "debian7", Base: "null", OwnerID: 1, Memory: 512, Vcpu: 1},
-	model.Vm{Name: "ubuntu", Base: "null", OwnerID: 2},
+	model.Vm{Name: "debian7", Base: "null", OwnerID: 3, Memory: 512, Vcpu: 1},
+	model.Vm{Name: "ubuntu", Base: "null", OwnerID: 3},
 }
 
 var things = []model.Thing{

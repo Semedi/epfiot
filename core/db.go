@@ -46,6 +46,10 @@ func NewDB(path string) (*DB, error) {
 	return &DB{db}, nil
 }
 
+func (db *DB) Savevm(vm *model.Vm) {
+	db.DB.Save(vm)
+}
+
 func (db *DB) CreateHostdevs(devices_str [][]string) error {
 	BUS := 0
 	DEV := 1

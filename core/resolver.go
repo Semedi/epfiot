@@ -236,6 +236,38 @@ func (r *Resolver) CreateThing(ctx context.Context, args struct{ Thing thingInpu
 	return &s, nil
 }
 
+// TODO:
+func (r *Resolver) CreateThingVm(ctx context.Context, args struct {
+	Thing thingInput
+	VmID  graphql.ID
+}) (*ThingResolver, error) {
+	vmID, err := gqlIDToUint(args.VmID)
+	if err != nil {
+		return nil, err
+	}
+
+	t, err := r.Db.AddThing(args.Thing)
+
+	if err != nil {
+		return nil, err
+	}
+
+	vm, err := r.Db.getVm(vmID)
+	if err != nil {
+		return nil, err
+	}
+
+	vm.Things = append(vm.Things, *t)
+	r.Db.Savevm(vm)
+
+	s := ThingResolver{
+		db: r.Db,
+		m:  *t,
+	}
+
+	return &s, nil
+}
+
 // encode cursor encodes the cursot position in base64
 func encodeCursor(i int) graphql.ID {
 	return graphql.ID(base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("cursor%d", i))))
