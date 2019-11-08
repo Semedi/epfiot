@@ -206,6 +206,55 @@ func (r *Resolver) UpdateVm(args struct{ Vm vmInput }) (*VmResolver, error) {
 	return &s, nil
 }
 
+func (r *Resolver) PowerON(args struct{ VmID graphql.ID }) (*VmResolver, error) {
+	vmID, err := gqlIDToUint(args.VmID)
+	if err != nil {
+		return nil, err
+	}
+
+	vm, err := r.Db.getVm(vmID)
+	if err != nil {
+		return nil, err
+	}
+
+	query := vm.Name
+
+	err = r.Controller.Handler.PowerOn(query)
+	if err != nil {
+		return nil, err
+	}
+
+	return &VmResolver{
+		db: r.Db,
+		m:  *vm,
+	}, nil
+
+}
+
+func (r *Resolver) PowerOFF(args struct{ VmID graphql.ID }) (*VmResolver, error) {
+	vmID, err := gqlIDToUint(args.VmID)
+	if err != nil {
+		return nil, err
+	}
+
+	vm, err := r.Db.getVm(vmID)
+	if err != nil {
+		return nil, err
+	}
+
+	query := vm.Name
+	err = r.Controller.Handler.Shutdown(query)
+	if err != nil {
+		return nil, err
+	}
+
+	return &VmResolver{
+		db: r.Db,
+		m:  *vm,
+	}, nil
+
+}
+
 // TODO:
 // send udp request to bootstrap only if IP
 func (r *Resolver) AttachThing(args struct{ ThingID, VmID graphql.ID }) (*bool, error) {
