@@ -12,6 +12,7 @@ type Driver interface {
 	Listt()
 	Shutdown(query string) error
 	Destroy(query string) error
+	ForceOFF(query string) error
 	PowerOn(query string) error
 	Close()
 }

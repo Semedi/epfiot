@@ -161,23 +161,13 @@ func (l *Libvirt) Shutdown(query string) error {
 func (l *Libvirt) Destroy(query string) error {
 
 	r, dom := l.get(query)
-
 	if r != true {
 		errors.New("domain not found!")
 	}
 
 	info, err := dom.GetInfo()
-
 	if err != nil {
 		return err
-	}
-
-	//RUNNING
-	if info.State == 1 {
-		err := dom.Destroy()
-		if err != nil {
-			return err
-		}
 	}
 
 	//SHUTOFF
@@ -185,6 +175,29 @@ func (l *Libvirt) Destroy(query string) error {
 
 		// delete nvram file
 		err := dom.UndefineFlags(4)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (l *Libvirt) ForceOFF(query string) error {
+
+	r, dom := l.get(query)
+	if r != true {
+		errors.New("domain not found!")
+	}
+
+	info, err := dom.GetInfo()
+	if err != nil {
+		return err
+	}
+
+	//RUNNING
+	if info.State == 1 {
+		err := dom.Destroy()
 		if err != nil {
 			return err
 		}

@@ -255,6 +255,32 @@ func (r *Resolver) PowerOFF(args struct{ VmID graphql.ID }) (*VmResolver, error)
 
 }
 
+func (r *Resolver) ForceOFF(args struct{ VmID graphql.ID }) (*bool, error) {
+	vmID, err := gqlIDToUint(args.VmID)
+	b := false
+
+	if err != nil {
+		return &b, err
+	}
+
+	vm, err := r.Db.getVm(vmID)
+	if err != nil {
+		return &b, err
+	}
+
+	query := vm.Name
+	err = r.Controller.Handler.ForceOFF(query)
+	if err != nil {
+		return &b, err
+	}
+
+	b = true
+	return &b, nil
+}
+
+// TODO:
+//	ERASE VM FROM DATABASE
+//  DELETE DISK IN DRIVER OPERATION
 func (r *Resolver) DestroyVM(args struct{ VmID graphql.ID }) (*bool, error) {
 	vmID, err := gqlIDToUint(args.VmID)
 	b := false
