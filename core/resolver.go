@@ -206,6 +206,33 @@ func (r *Resolver) UpdateVm(args struct{ Vm vmInput }) (*VmResolver, error) {
 	return &s, nil
 }
 
+// TODO:
+// send udp request to bootstrap only if IP
+func (r *Resolver) AttachThing(args struct{ ThingID, VmID graphql.ID }) (*bool, error) {
+	vmID, err := gqlIDToUint(args.VmID)
+	if err != nil {
+		return nil, err
+	}
+
+	thingID, err := gqlIDToUint(args.ThingID)
+	if err != nil {
+		return nil, err
+	}
+
+	thing, err := r.Db.getThing(thingID)
+	if err != nil {
+		return nil, err
+	}
+
+	thing.VmID = vmID
+
+	r.Db.SaveThing(thing)
+
+	b := true
+
+	return &b, nil
+}
+
 // DeleteVm takes care of deleting a vm record
 func (r *Resolver) DeleteVm(args struct{ UserID, VmID graphql.ID }) (*bool, error) {
 	vmID, err := gqlIDToUint(args.VmID)
@@ -237,6 +264,7 @@ func (r *Resolver) CreateThing(ctx context.Context, args struct{ Thing thingInpu
 }
 
 // TODO:
+// send udp request to bootstrap if have ip
 func (r *Resolver) CreateThingVm(ctx context.Context, args struct {
 	Thing thingInput
 	VmID  graphql.ID
