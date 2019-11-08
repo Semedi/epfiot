@@ -24,6 +24,7 @@ type Mutation {
   attachThing(thingID: ID!, vmID: ID!): Boolean
   powerON(vmID: ID!): Vm
   powerOFF(vmID: ID!): Vm
+  destroyVM(vmID: ID!): Boolean
 }
 
 "what is needed for a vm"

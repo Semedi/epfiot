@@ -255,6 +255,30 @@ func (r *Resolver) PowerOFF(args struct{ VmID graphql.ID }) (*VmResolver, error)
 
 }
 
+func (r *Resolver) DestroyVM(args struct{ VmID graphql.ID }) (*bool, error) {
+	vmID, err := gqlIDToUint(args.VmID)
+	b := false
+
+	if err != nil {
+		return &b, err
+	}
+
+	vm, err := r.Db.getVm(vmID)
+	if err != nil {
+		return &b, err
+	}
+
+	query := vm.Name
+	err = r.Controller.Handler.Destroy(query)
+	if err != nil {
+		return &b, err
+	}
+
+	b = true
+	return &b, nil
+
+}
+
 // TODO:
 // send udp request to bootstrap only if IP
 func (r *Resolver) AttachThing(args struct{ ThingID, VmID graphql.ID }) (*bool, error) {
