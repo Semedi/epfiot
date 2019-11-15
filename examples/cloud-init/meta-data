@@ -1,1 +1,2 @@
-id: example-test-test
+instance-id: myVM
+dsmode: local

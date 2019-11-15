@@ -1,0 +1,11 @@
+network: 
+  version: 1
+  config:
+    - type: physical
+      name: enp2s1
+      mac_address: 52:54:00:9d:2c:67
+      subnets:
+        - type: static
+          address: 10.0.0.2
+          netmask: 255.255.255.0
+          gateway: 10.0.0.1

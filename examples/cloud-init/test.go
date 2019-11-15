@@ -12,7 +12,7 @@ func main() {
 	}
 
 	cd := "config.iso"
-	cmd := exec.Command("genisoimage", "-output", cd, "-joliet", "-rock", "user-data", "meta-data")
+	cmd := exec.Command("genisoimage", "-output", cd, "-volid", "cidata", "-joliet", "-rock", "user-data", "meta-data", "network-config")
 	err := cmd.Run()
 
 	if err != nil {
