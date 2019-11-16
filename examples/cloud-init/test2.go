@@ -7,27 +7,54 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var data = `
-a: Easy!
-b:
-  c: 2
-  d: [3, 4]
-`
-
-// Note: struct fields must be public in order for unmarshal to
-// correctly populate the data.
-type T struct {
-	A string
-	B struct {
-		RenamedC int
-		D        []int
+//----------------------------
+// network-config
+//----------------------------
+type Net struct {
+	Network struct {
+		Version int
+		Config  []Nconfig
 	}
 }
+type Subnet struct {
+	Type            string
+	Address         string
+	Netmask         string
+	Gateway         string
+	Dns_nameservers []string
+}
+type Nconfig struct {
+	Type        string
+	Name        string
+	Mac_address string
+	Subnets     []Subnet
+}
 
-type M struct {
-	A string
-	C string
-	D string
+//----------------------------
+// user-data
+//----------------------------
+
+type Udata struct {
+	Package_upgrade bool
+	Users           []Uconfig
+}
+
+type Uconfig struct {
+	Name        string
+	Groups      string
+	Lock_passwd bool
+	Passwd      string
+	Shell       string
+	Sudo        []string
+	Keys        []string `yaml:"ssh-authorized-keys,omitempty"`
+}
+
+//----------------------------
+// meta-data
+//----------------------------
+type Metadata struct {
+	Id     string `yaml:"instance-id"`
+	Dsmode string
 }
 
 func write_config(t interface{}) {
@@ -40,16 +67,42 @@ func write_config(t interface{}) {
 }
 
 func main() {
-	t := T{}
-	t2 := M{}
+	t3 := Net{}
+	t3.Network.Version = 1
+	t3.Network.Config = []Nconfig{
+		{
+			Type:        "physical",
+			Name:        "enp2s1",
+			Mac_address: "aa:bb:cc:dd:ee",
+			Subnets: []Subnet{
+				{
+					Type:            "static",
+					Address:         "10.0.0.2",
+					Netmask:         "255.255.255.0",
+					Gateway:         "10.0.0.1",
+					Dns_nameservers: []string{"10.0.0.1", "8.8.8.8"},
+				},
+			},
+		},
+	}
 
-	t.A = "prolla"
-	t.B.D = []int{1, 2}
+	t4 := Udata{}
+	t4.Package_upgrade = false
+	t4.Users = []Uconfig{
+		{
+			Name:        "semedi",
+			Groups:      "wheel",
+			Lock_passwd: false,
+			Passwd:      "$1$SaltSalt$pdqtneIkXPJIjowbO8gt7/",
+			Shell:       "/bin/bash",
+			Sudo:        []string{"ALL=(ALL) NOPASSWD:ALL"},
+			Keys:        []string{"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCbA3KjpnI6gJLGoKru/iq1qhw+3y3B7Bqu5+MRVv3DTcc8wUocpePR8VH4MYomwBtEOki/13ZBRsl4zEkRorrRaITUlC/atUiUhI8u/8nFHGRkTFSMD3aFriysonfm5Ipg2arhpQMvbtDcd/oVcCpHnc1ifEOXHfm1Eyslhg8A91rLj2frFB5+Cqx1Gi+sfZ+L8ysA+Psrzf00Xn9EkDhLuomizzGSVc06dRxPb/Y2V+qHd7R2D/DxQXaaBGuPFCHS/bzLh4Y4Md5LKTVpZ3mTDD8ywdnTb1CEjGUyg1RAWXqqx+fbzVPGeAmkPgW0ZZpc1J3VycQfYQXvbzd53JynuljXZPsRT27+KXYnabCHPGsm4On6OUUgzkWZB/GpVVUw/xtTUPBgD5VUW3N850Z+sBRfqW7+uEqBybxwznp8klT+GSQ2vJC2R6bXOS7EJmU1iPTp7fRPC5zJiIGR+7ChSLNtTabWdO2FPGeGnZ9Mt1IJpyYvoknbTsWBBXwXu+hjxhT64XX9LBD+pebejIaWckOg51zX5kVgf+bNPvX1XSK9W2dOUTfcRkeWHwo7WqpAhbmXAkGju09Icjmk66drOhyTMmuPlEWmeWogcYGMizXtQK2GBQgnplEFH6/Hr1nmtKu1WLuwoiiVvluUg/bkr8DRwLaUT7KXr41WwLAT5Q== semedi@debian-semedi"},
+		},
+	}
 
-	t2.A = "colega"
-	t2.C = "eyy"
+	t5 := Metadata{Id: "myVM", Dsmode: "local"}
 
-	write_config(t)
-	write_config(t2)
-
+	write_config(t3)
+	write_config(t4)
+	write_config(t5)
 }
