@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 
 	"gopkg.in/yaml.v2"
@@ -57,13 +58,14 @@ type Metadata struct {
 	Dsmode string
 }
 
-func write_config(t interface{}) {
+func write_config(t interface{}, filename string) {
 
 	d, err := yaml.Marshal(&t)
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
-	fmt.Printf("--- t dump:\n%s\n\n", string(d))
+	fmt.Printf("--- yaml dump:\n%s\n\n", string(d))
+	ioutil.WriteFile(filename, d, 0644)
 }
 
 func main() {
@@ -102,7 +104,7 @@ func main() {
 
 	t5 := Metadata{Id: "myVM", Dsmode: "local"}
 
-	write_config(t3)
-	write_config(t4)
-	write_config(t5)
+	write_config(t3, "network-config")
+	write_config(t4, "user-data")
+	write_config(t5, "meta-data")
 }
