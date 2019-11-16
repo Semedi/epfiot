@@ -6,6 +6,8 @@ import (
 	"log"
 
 	"gopkg.in/yaml.v2"
+	"os"
+	"os/exec"
 )
 
 //----------------------------
@@ -104,7 +106,26 @@ func main() {
 
 	t5 := Metadata{Id: "myVM", Dsmode: "local"}
 
+	os.Remove("network-config")
 	write_config(t3, "network-config")
+	if _, err := os.Stat("network-config"); os.IsNotExist(err) {
+		log.Fatalf("file not exists something bad happened!")
+	}
+	os.Remove("user-data")
 	write_config(t4, "user-data")
+	if _, err := os.Stat("user-data"); os.IsNotExist(err) {
+		log.Fatalf("file not exists something bad happened!")
+	}
+	os.Remove("meta-data")
 	write_config(t5, "meta-data")
+	if _, err := os.Stat("meta-data"); os.IsNotExist(err) {
+		log.Fatalf("file not exists something bad happened!")
+	}
+
+	cd := "config.iso"
+	cmd := exec.Command("genisoimage", "-output", cd, "-volid", "cidata", "-joliet", "-rock", "user-data", "meta-data", "network-config")
+	err := cmd.Run()
+	if err != nil {
+		log.Fatalf("cmd.Run() failed with %s\n", err)
+	}
 }
