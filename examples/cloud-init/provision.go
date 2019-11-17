@@ -67,6 +67,11 @@ func write_config(t interface{}, filename string) {
 		log.Fatalf("error: %v", err)
 	}
 	fmt.Printf("--- yaml dump:\n%s\n\n", string(d))
+
+	if filename == "user-data" {
+		d = append([]byte("#cloud-config\n"), d...)
+	}
+
 	ioutil.WriteFile(filename, d, 0644)
 }
 
@@ -77,7 +82,7 @@ func main() {
 		{
 			Type:        "physical",
 			Name:        "enp2s1",
-			Mac_address: "aa:bb:cc:dd:ee",
+			Mac_address: "52:54:00:27:ae:db",
 			Subnets: []Subnet{
 				{
 					Type:            "static",
@@ -89,6 +94,7 @@ func main() {
 			},
 		},
 	}
+	key := "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCbA3KjpnI6gJLGoKru/iq1qhw+3y3B7Bqu5+MRVv3DTcc8wUocpePR8VH4MYomwBtEOki/13ZBRsl4zEkRorrRaITUlC/atUiUhI8u/8nFHGRkTFSMD3aFriysonfm5Ipg2arhpQMvbtDcd/oVcCpHnc1ifEOXHfm1Eyslhg8A91rLj2frFB5+Cqx1Gi+sfZ+L8ysA+Psrzf00Xn9EkDhLuomizzGSVc06dRxPb/Y2V+qHd7R2D/DxQXaaBGuPFCHS/bzLh4Y4Md5LKTVpZ3mTDD8ywdnTb1CEjGUyg1RAWXqqx+fbzVPGeAmkPgW0ZZpc1J3VycQfYQXvbzd53JynuljXZPsRT27+KXYnabCHPGsm4On6OUUgzkWZB/GpVVUw/xtTUPBgD5VUW3N850Z+sBRfqW7+uEqBybxwznp8klT+GSQ2vJC2R6bXOS7EJmU1iPTp7fRPC5zJiIGR+7ChSLNtTabWdO2FPGeGnZ9Mt1IJpyYvoknbTsWBBXwXu+hjxhT64XX9LBD+pebejIaWckOg51zX5kVgf+bNPvX1XSK9W2dOUTfcRkeWHwo7WqpAhbmXAkGju09Icjmk66drOhyTMmuPlEWmeWogcYGMizXtQK2GBQgnplEFH6/Hr1nmtKu1WLuwoiiVvluUg/bkr8DRwLaUT7KXr41WwLAT5Q=="
 
 	t4 := Udata{}
 	t4.Package_upgrade = false
@@ -100,7 +106,7 @@ func main() {
 			Passwd:      "$1$SaltSalt$pdqtneIkXPJIjowbO8gt7/",
 			Shell:       "/bin/bash",
 			Sudo:        []string{"ALL=(ALL) NOPASSWD:ALL"},
-			Keys:        []string{"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCbA3KjpnI6gJLGoKru/iq1qhw+3y3B7Bqu5+MRVv3DTcc8wUocpePR8VH4MYomwBtEOki/13ZBRsl4zEkRorrRaITUlC/atUiUhI8u/8nFHGRkTFSMD3aFriysonfm5Ipg2arhpQMvbtDcd/oVcCpHnc1ifEOXHfm1Eyslhg8A91rLj2frFB5+Cqx1Gi+sfZ+L8ysA+Psrzf00Xn9EkDhLuomizzGSVc06dRxPb/Y2V+qHd7R2D/DxQXaaBGuPFCHS/bzLh4Y4Md5LKTVpZ3mTDD8ywdnTb1CEjGUyg1RAWXqqx+fbzVPGeAmkPgW0ZZpc1J3VycQfYQXvbzd53JynuljXZPsRT27+KXYnabCHPGsm4On6OUUgzkWZB/GpVVUw/xtTUPBgD5VUW3N850Z+sBRfqW7+uEqBybxwznp8klT+GSQ2vJC2R6bXOS7EJmU1iPTp7fRPC5zJiIGR+7ChSLNtTabWdO2FPGeGnZ9Mt1IJpyYvoknbTsWBBXwXu+hjxhT64XX9LBD+pebejIaWckOg51zX5kVgf+bNPvX1XSK9W2dOUTfcRkeWHwo7WqpAhbmXAkGju09Icjmk66drOhyTMmuPlEWmeWogcYGMizXtQK2GBQgnplEFH6/Hr1nmtKu1WLuwoiiVvluUg/bkr8DRwLaUT7KXr41WwLAT5Q== semedi@debian-semedi"},
+			Keys:        []string{key},
 		},
 	}
 
