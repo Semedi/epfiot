@@ -1,10 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"net"
 	"strings"
-	//"bufio"
-	//"net"
 )
 
 const (
@@ -96,19 +96,19 @@ func main() {
 
 	fmt.Printf(pet.out())
 
-	//p := make([]byte, 2048)
-	//conn, err := net.Dial("udp", "127.0.0.1:5400")
-	//if err != nil {
-	//	fmt.Printf("Some error %v", err)
-	//	return
-	//}
+	p := make([]byte, 2048)
+	conn, err := net.Dial("udp", "127.0.0.1:5400")
+	if err != nil {
+		fmt.Printf("Some error %v", err)
+		return
+	}
 
-	//fmt.Fprintf(conn, petition(SERVER, "Delete=/0,Delete=/1,Server=2"))
-	//_, err = bufio.NewReader(conn).Read(p)
-	//if err == nil {
-	//	fmt.Printf("%s\n", p)
-	//} else {
-	//	fmt.Printf("Some error %v\n", err)
-	//}
-	//conn.Close()
+	fmt.Fprintf(conn, pet.out())
+	_, err = bufio.NewReader(conn).Read(p)
+	if err == nil {
+		fmt.Printf("%s\n", p)
+	} else {
+		fmt.Printf("Some error %v\n", err)
+	}
+	conn.Close()
 }
