@@ -163,6 +163,13 @@ type vmInput struct {
 	Vcpu     int32
 	DevIDs   *[]*int32
 	ThingIDs *[]*int32
+	Config   *configInput
+}
+
+type configInput struct {
+	User     *string
+	Password *string
+	Address  *string
 }
 
 type thingInput struct {

@@ -93,6 +93,13 @@ input VmInput {
   vcpu:   Int = 1
   devIDs: [Int]
   thingIDs: [Int]
+  config: ConfigInput
+}
+
+input ConfigInput {
+  user: String
+  password: String
+  address: String
 }
 
 input ThingInput {
