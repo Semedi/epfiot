@@ -1,0 +1,15 @@
+
+# epfiot configuration example
+
+
+source /etc/network/interfaces.d/*
+
+auto lo
+iface lo inet loopback
+
+iface {iface} manual
+iface {iface} inet manual
+auto epfiot-net
+  iface epfiot-net inet dhcp
+      bridge ports {iface}
+

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# EXAMPLE using brctl
+
+$IFACE
+
+/sbin/brctl addbr epfiot-net
+/sbin/brctl addif epfiot-net $IFACE
+/sbin/ip link set $IFACE up
+/sbin/ifup epfiot-net
+
+
+
+
