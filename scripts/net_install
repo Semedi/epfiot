@@ -19,7 +19,7 @@ ip addr add dev $NET $ADDR
 iptables -t nat -A POSTROUTING -o $DEFAULT -j MASQUERADE
 
 # LIBVIRT MANAGED
-#virsh net-define --file default.xml
+#virsh net-define --file xml/default.xml
 #virsh net-start default
 #virsh net-autostart --network default
 

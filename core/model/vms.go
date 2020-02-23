@@ -15,3 +15,9 @@ type Vm struct {
 	Dev     []Hostdev `gorm:"foreignkey:VmID"`
 	Things  []Thing   `gorm:"foreignkey:VmID"`
 }
+
+type ConfigInput struct {
+	User     *string
+	Password *string
+	Address  *string
+}

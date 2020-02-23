@@ -163,13 +163,7 @@ type vmInput struct {
 	Vcpu     int32
 	DevIDs   *[]*int32
 	ThingIDs *[]*int32
-	Config   *configInput
-}
-
-type configInput struct {
-	User     *string
-	Password *string
-	Address  *string
+	Config   *model.ConfigInput
 }
 
 type thingInput struct {
@@ -182,12 +176,19 @@ type thingInput struct {
 func (r *Resolver) CreateVm(ctx context.Context, args struct{ Vm vmInput }) (*VmResolver, error) {
 	id := ctx.Value("userid").(uint)
 
+	// concurrency point:
 	driver.Copy_base(args.Vm.Base, id, args.Vm.Name)
 
 	vm, err := r.Db.addVm(args.Vm, id)
 	if err != nil {
 		return nil, err
 	}
+	// end concurrency
+
+	if args.Vm.Config != nil {
+		driver.Create_config(args.Vm.Name, args.Vm.Config)
+	}
+
 	r.Controller.Handler.Create(*vm, id)
 
 	s := VmResolver{

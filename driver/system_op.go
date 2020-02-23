@@ -7,15 +7,18 @@ import "fmt"
 import "strings"
 import "bufio"
 
-var location string
-var connection []string
+const METHOD = 0
+const HOST = 1
+
+var Location string
+var Connection []string
 
 func Initfs(l string, auth_host []string) {
 	mode := int(0755)
 
-	connection = auth_host
-	location = l
-	_ = os.MkdirAll(location+"/base", os.FileMode(mode))
+	Connection = auth_host
+	Location = l
+	_ = os.MkdirAll(Location+"/base", os.FileMode(mode))
 }
 
 func Usb_info() [][]string {
@@ -38,8 +41,8 @@ func Usb_info() [][]string {
 
 func execute(parameters ...string) string {
 
-	if connection != nil {
-		parameters = append(connection, parameters...)
+	if Connection != nil {
+		parameters = append(Connection, parameters...)
 	}
 
 	name, args := parameters[0], parameters[1:]
@@ -55,14 +58,14 @@ func execute(parameters ...string) string {
 }
 
 func folder(user uint) string {
-	usrlocation := fmt.Sprintf("%s%s%d", location, "/user/", user)
+	usrlocation := fmt.Sprintf("%s%s%d", Location, "/user/", user)
 	execute("mkdir", "-p", usrlocation)
 
 	return usrlocation
 }
 
 func basefile(base string) string {
-	return fmt.Sprintf("%s%s%s", location, "/base/", base)
+	return fmt.Sprintf("%s%s%s", Location, "/base/", base)
 }
 
 func Vmfile(user uint, name string) string {
