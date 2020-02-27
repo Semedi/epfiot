@@ -185,11 +185,12 @@ func (r *Resolver) CreateVm(ctx context.Context, args struct{ Vm vmInput }) (*Vm
 	}
 	// end concurrency
 
-	if args.Vm.Config != nil {
-		driver.Create_config(args.Vm.Name, args.Vm.Config)
+	config_path, err := driver.Create_config(args.Vm.Name, args.Vm.Config)
+	if err != nil {
+		return nil, err
 	}
 
-	r.Controller.Handler.Create(*vm, id)
+	r.Controller.Handler.Create(*vm, id, config_path)
 
 	s := VmResolver{
 		db: r.Db,

@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 )
 
@@ -69,14 +70,18 @@ func write_config(t interface{}, filename string) {
 	}
 	fmt.Printf("--- yaml dump:\n%s\n\n", string(d))
 
-	if filename == "user-data" {
+	if filepath.Base(filename) == "user-data" {
 		d = append([]byte("#cloud-config\n"), d...)
 	}
 
 	ioutil.WriteFile(filename, d, 0644)
 }
 
-func Create_config(vmname string, c *model.ConfigInput) {
+func Create_config(vmname string, c *model.ConfigInput) (*string, error) {
+
+	if c == nil {
+		return nil, nil
+	}
 
 	// mandatory network:
 	t3 := Net{}
@@ -114,7 +119,7 @@ func Create_config(vmname string, c *model.ConfigInput) {
 			encrypt := sha512_crypt.New()
 			hash, err := encrypt.Generate([]byte(*c.Password), []byte("$6$usesomesillystringforsalt"))
 			if err != nil {
-				panic(err)
+				return nil, err
 			}
 			user_config.Passwd = hash
 		}
@@ -135,22 +140,22 @@ func Create_config(vmname string, c *model.ConfigInput) {
 
 	write_config(t3, network_config)
 	if _, err := os.Stat(network_config); os.IsNotExist(err) {
-		log.Fatalf("file not exists something bad happened!")
+		return nil, err
 	}
 	write_config(t4, user_data)
 	if _, err := os.Stat(user_data); os.IsNotExist(err) {
-		log.Fatalf("file not exists something bad happened!")
+		return nil, err
 	}
 	write_config(t5, meta_data)
 	if _, err := os.Stat(meta_data); os.IsNotExist(err) {
-		log.Fatalf("file not exists something bad happened!")
+		return nil, err
 	}
 
 	cmd := exec.Command("genisoimage", "-output", cd, "-volid", "cidata", "-joliet", "-rock", user_data, meta_data, network_config)
 
 	err := cmd.Run()
 	if err != nil {
-		log.Fatalf("cmd.Run() failed with %s\n", err)
+		return nil, err
 	}
 
 	// copy to remote
@@ -160,7 +165,11 @@ func Create_config(vmname string, c *model.ConfigInput) {
 		cmd := exec.Command("scp", strings.Fields(dest_cmd)...)
 		err := cmd.Run()
 		if err != nil {
-			log.Fatalf("%s\n", dest_cmd)
+			return nil, err
 		}
 	}
+
+	final_path := fmt.Sprintf("%s/%s", Location, filepath.Base(cd))
+
+	return &final_path, nil
 }

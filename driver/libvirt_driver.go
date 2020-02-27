@@ -244,7 +244,7 @@ func (l *Libvirt) Listt() {
 	l.List()
 }
 
-func setDevices(d *libvirtxml.Domain, ilocation string, vm model.Vm) {
+func setDevices(d *libvirtxml.Domain, ilocation string, vm model.Vm, config_path *string) {
 	d.Devices.Interfaces = []libvirtxml.DomainInterface{
 		{
 			Source: &libvirtxml.DomainInterfaceSource{
@@ -288,6 +288,18 @@ func setDevices(d *libvirtxml.Domain, ilocation string, vm model.Vm) {
 			Target: &libvirtxml.DomainDiskTarget{Dev: "hda", Bus: "virtio"},
 		},
 	}
+
+	if config_path != nil {
+		d.Devices.Disks = append(d.Devices.Disks, libvirtxml.DomainDisk{
+			Device:   "cdrom",
+			Source:   &libvirtxml.DomainDiskSource{File: &libvirtxml.DomainDiskSourceFile{File: *config_path}},
+			Driver:   &libvirtxml.DomainDiskDriver{Name: "qemu", Type: "raw"},
+			Target:   &libvirtxml.DomainDiskTarget{Dev: "sda", Bus: "sata"},
+			ReadOnly: &libvirtxml.DomainDiskReadOnly{},
+		})
+
+	}
+
 }
 
 func setMemory(d *libvirtxml.Domain, m int) {
@@ -298,10 +310,10 @@ func setMemory(d *libvirtxml.Domain, m int) {
 	}
 }
 
-func (l *Libvirt) Create(vm model.Vm, uid uint) {
+func (l *Libvirt) Create(vm model.Vm, uid uint, config_path *string) {
 	domcfg := domain_def(vm.Name, vm.Vcpu)
 
-	setDevices(&domcfg, Vmfile(uid, vm.Name), vm)
+	setDevices(&domcfg, Vmfile(uid, vm.Name), vm, config_path)
 	setMemory(&domcfg, vm.Memory)
 
 	xml, err := domcfg.Marshal()
