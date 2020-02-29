@@ -341,6 +341,33 @@ func (r *Resolver) AttachThing(args struct{ ThingID, VmID graphql.ID }) (*bool, 
 	return &b, nil
 }
 
+// TODO:
+// send udp request to bootstrap only if IP
+func (r *Resolver) AttachDevice(args struct{ DevID, VmID graphql.ID }) (*bool, error) {
+	vmID, err := gqlIDToUint(args.VmID)
+	if err != nil {
+		return nil, err
+	}
+
+	devID, err := gqlIDToUint(args.DevID)
+	if err != nil {
+		return nil, err
+	}
+
+	dev, err := r.Db.getDev(devID)
+	if err != nil {
+		return nil, err
+	}
+
+	dev.VmID = vmID
+
+	r.Db.SaveDev(dev)
+
+	b := true
+
+	return &b, nil
+}
+
 // DeleteVm takes care of deleting a vm record
 func (r *Resolver) DeleteVm(args struct{ UserID, VmID graphql.ID }) (*bool, error) {
 	vmID, err := gqlIDToUint(args.VmID)

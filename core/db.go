@@ -54,6 +54,10 @@ func (db *DB) SaveThing(thing *model.Thing) {
 	db.DB.Save(thing)
 }
 
+func (db *DB) SaveDev(dev *model.Hostdev) {
+	db.DB.Save(dev)
+}
+
 func (db *DB) CreateHostdevs(devices_str [][]string) error {
 	BUS := 0
 	DEV := 1
