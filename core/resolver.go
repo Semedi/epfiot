@@ -359,8 +359,17 @@ func (r *Resolver) AttachDevice(args struct{ DevID, VmID graphql.ID }) (*bool, e
 		return nil, err
 	}
 
-	dev.VmID = vmID
+	vm, err := r.Db.getVm(vmID)
+	if err != nil {
+		return nil, err
+	}
 
+	err = r.Controller.Handler.AttachDevice(*vm, *dev)
+	if err != nil {
+		return nil, err
+	}
+
+	dev.VmID = vmID
 	r.Db.SaveDev(dev)
 
 	b := true

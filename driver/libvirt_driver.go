@@ -244,6 +244,45 @@ func (l *Libvirt) Listt() {
 	l.List()
 }
 
+func (l *Libvirt) AttachDevice(vm model.Vm, hdev model.Hostdev) error {
+	r, dom := l.get(vm.Name)
+	if r != true {
+		return errors.New("domain not found!")
+	}
+
+	bus, _ := strconv.ParseUint(hdev.Bus, 10, 32)
+	dev, _ := strconv.ParseUint(hdev.Device, 10, 32)
+
+	ubus := uint(bus)
+	udev := uint(dev)
+
+	usb := &libvirtxml.DomainAddressUSB{
+		Bus:    &ubus,
+		Device: &udev,
+	}
+
+	devcfg := libvirtxml.DomainHostdev{
+		Managed: "yes",
+		SubsysUSB: &libvirtxml.DomainHostdevSubsysUSB{
+			Source: &libvirtxml.DomainHostdevSubsysUSBSource{
+				Address: usb},
+		},
+	}
+	xml, err := devcfg.Marshal()
+	if err != nil {
+		panic(err)
+	}
+
+	err = dom.AttachDevice(xml)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(xml)
+
+	return nil
+}
+
 func setDevices(d *libvirtxml.Domain, ilocation string, vm model.Vm, config_path *string) {
 	d.Devices.Interfaces = []libvirtxml.DomainInterface{
 		{
@@ -309,7 +348,6 @@ func setMemory(d *libvirtxml.Domain, m int) {
 		DumpCore: "on",
 	}
 }
-
 func (l *Libvirt) Create(vm model.Vm, uid uint, config_path *string) {
 	domcfg := domain_def(vm.Name, vm.Vcpu)
 
