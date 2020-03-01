@@ -46,12 +46,12 @@ func main() {
 	config := read_config()
 	driver.Initfs(config.Storage, []string{config.Auth, config.Host})
 
-	controller := driver.New(config.Driver, config.uri())
-	server := service.New(controller)
+	provider := driver.New(config.Driver, config.uri())
+	server := service.New(provider)
 
-	//controller.Handler.Destroy("polla")
-	//controller.Handler.Shutdown("polla")
-	//controller.Handler.PowerOn("polla")
+	//provider.Destroy("polla")
+	//provider.Shutdown("polla")
+	//provider.PowerOn("polla")
 
 	server.Run()
 

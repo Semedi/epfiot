@@ -21,10 +21,10 @@ var frontend *template.Template
 
 type Server struct {
 	db *core.DB
-	c  *driver.Controller
+	c  driver.Provider
 }
 
-func New(drv *driver.Controller) *Server {
+func New(drv driver.Provider) *Server {
 	var r error
 	frontend, r = template.ParseGlob("service/front/*.html")
 	if r != nil {
