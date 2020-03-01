@@ -12,6 +12,7 @@ type Vm struct {
 	Name    string
 	Memory  int
 	Vcpu    int
+	Ip      string
 	Dev     []Hostdev `gorm:"foreignkey:VmID"`
 	Things  []Thing   `gorm:"foreignkey:VmID"`
 }
@@ -19,5 +20,4 @@ type Vm struct {
 type ConfigInput struct {
 	User     *string
 	Password *string
-	Address  *string
 }

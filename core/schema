@@ -38,6 +38,7 @@ type Vm {
   base: String
   vcpu: Int
   memory: Int
+  ip: String
   dev: [Hostdev]
   things: [Thing]
 }
@@ -101,7 +102,6 @@ input VmInput {
 input ConfigInput {
   user: String
   password: String
-  address: String
 }
 
 input ThingInput {

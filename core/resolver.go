@@ -635,6 +635,10 @@ func (p *VmResolver) Base(ctx context.Context) *string {
 	return &p.m.Base
 }
 
+func (p *VmResolver) Ip(ctx context.Context) *string {
+	return &p.m.Ip
+}
+
 // Dev resolves the vm devices
 func (p *VmResolver) Dev(ctx context.Context) (*[]*DevResolver, error) {
 	devices, err := p.db.getVmDev(&p.m)
