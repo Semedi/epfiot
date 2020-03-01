@@ -9,6 +9,7 @@ type Driver interface {
 	Init()
 	Create(vm model.Vm, uid uint, config_path *string)
 	AttachDevice(vm model.Vm, dev model.Hostdev) error
+	DetachDevice(vm model.Vm, dev model.Hostdev) error
 	List()
 	Listt()
 	Shutdown(query string) error

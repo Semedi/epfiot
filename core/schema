@@ -23,6 +23,7 @@ type Mutation {
   createThingVm(thing: ThingInput!, vmID: ID!): Thing
   attachThing(thingID: ID!, vmID: ID!): Boolean
   attachDevice(devID: ID!, vmID: ID!): Boolean
+  detachDevice(devID: ID!, vmID: ID!): Boolean
   powerON(vmID: ID!): Vm
   powerOFF(vmID: ID!): Vm
   destroyVM(vmID: ID!): Boolean

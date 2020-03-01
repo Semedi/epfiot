@@ -341,25 +341,54 @@ func (r *Resolver) AttachThing(args struct{ ThingID, VmID graphql.ID }) (*bool, 
 	return &b, nil
 }
 
-// TODO:
-// send udp request to bootstrap only if IP
-func (r *Resolver) AttachDevice(args struct{ DevID, VmID graphql.ID }) (*bool, error) {
-	vmID, err := gqlIDToUint(args.VmID)
+func (r *Resolver) get_vm_device(DevID, VmID graphql.ID) (*model.Vm, *model.Hostdev, error) {
+
+	vmID, err := gqlIDToUint(VmID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	devID, err := gqlIDToUint(args.DevID)
+	devID, err := gqlIDToUint(DevID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	dev, err := r.Db.getDev(devID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	vm, err := r.Db.getVm(vmID)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return vm, dev, nil
+}
+
+func (r *Resolver) DetachDevice(args struct{ DevID, VmID graphql.ID }) (*bool, error) {
+
+	vm, dev, err := r.get_vm_device(args.DevID, args.VmID)
+	if err != nil {
+		return nil, err
+	}
+
+	err = r.Controller.Handler.DetachDevice(*vm, *dev)
+	if err != nil {
+		return nil, err
+	}
+
+	dev.VmID = vm.Model.ID
+	r.Db.SaveDev(dev)
+
+	b := true
+	return &b, nil
+}
+
+// TODO:
+// send udp request to bootstrap only if IP
+func (r *Resolver) AttachDevice(args struct{ DevID, VmID graphql.ID }) (*bool, error) {
+	vm, dev, err := r.get_vm_device(args.DevID, args.VmID)
 	if err != nil {
 		return nil, err
 	}
@@ -369,7 +398,7 @@ func (r *Resolver) AttachDevice(args struct{ DevID, VmID graphql.ID }) (*bool, e
 		return nil, err
 	}
 
-	dev.VmID = vmID
+	dev.VmID = vm.Model.ID
 	r.Db.SaveDev(dev)
 
 	b := true

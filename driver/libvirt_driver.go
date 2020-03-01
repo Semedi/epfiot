@@ -243,12 +243,7 @@ func (l *Libvirt) List() {
 func (l *Libvirt) Listt() {
 	l.List()
 }
-
-func (l *Libvirt) AttachDevice(vm model.Vm, hdev model.Hostdev) error {
-	r, dom := l.get(vm.Name)
-	if r != true {
-		return errors.New("domain not found!")
-	}
+func xmldevice(hdev model.Hostdev) (string, error) {
 
 	bus, _ := strconv.ParseUint(hdev.Bus, 10, 32)
 	dev, _ := strconv.ParseUint(hdev.Device, 10, 32)
@@ -270,15 +265,45 @@ func (l *Libvirt) AttachDevice(vm model.Vm, hdev model.Hostdev) error {
 	}
 	xml, err := devcfg.Marshal()
 	if err != nil {
-		panic(err)
+		return "", err
+	}
+
+	return xml, nil
+}
+
+func (l *Libvirt) DetachDevice(vm model.Vm, hdev model.Hostdev) error {
+	r, dom := l.get(vm.Name)
+	if r != true {
+		return errors.New("domain not found!")
+	}
+
+	xml, err := xmldevice(hdev)
+	if err != nil {
+		return err
+	}
+	err = dom.DetachDevice(xml)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (l *Libvirt) AttachDevice(vm model.Vm, hdev model.Hostdev) error {
+	r, dom := l.get(vm.Name)
+	if r != true {
+		return errors.New("domain not found!")
+	}
+
+	xml, err := xmldevice(hdev)
+	if err != nil {
+		return err
 	}
 
 	err = dom.AttachDevice(xml)
 	if err != nil {
-		panic(err)
+		return err
 	}
-
-	fmt.Println(xml)
 
 	return nil
 }
