@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# LIBVIRT MANAGED
+sudo virsh net-define --file xml/epfiot_managed.xml
+sudo virsh net-start epfiot_managed
+sudo virsh net-autostart --network epfiot_managed
+
+sudo sh -c "echo 1 > /proc/sys/net/ipv4/ip_forward"

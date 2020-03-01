@@ -1,0 +1,16 @@
+<network connections='1'>
+  <name>epfiot_managed</name>
+  <uuid>9a05da11-e96b-47f3-8253-a3a482e445f5</uuid>
+  <forward dev='wlp2s0' mode='route'>
+    <interface dev='wlp2s0'/>
+  </forward>
+  <bridge name='virbr1' stp='on' delay='0'/>
+  <domain name='epfiot_managed'/>
+  <ip address='10.128.0.1' netmask='255.255.255.0'>
+    <dhcp>
+      <range start='10.128.0.128' end='10.128.0.254'/>
+    </dhcp>
+  </ip>
+  <route family='ipv4' address='10.128.0.0' prefix='24' gateway='10.128.0.1'/>
+</network>
+
