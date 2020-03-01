@@ -14,13 +14,11 @@ import (
 
 type Resolver struct {
 	Db         *DB
-	Controller *driver.Controller
+	Controller driver.Provider
 }
 
 // GetUser resolves the getUser query
 func (r *Resolver) GetUser(ctx context.Context, args struct{ ID graphql.ID }) (*UserResolver, error) {
-
-	r.Controller.Handler.Init()
 
 	id, err := gqlIDToUint(args.ID)
 	if err != nil {
@@ -190,7 +188,7 @@ func (r *Resolver) CreateVm(ctx context.Context, args struct{ Vm vmInput }) (*Vm
 		return nil, err
 	}
 
-	r.Controller.Handler.Create(*vm, id, config_path)
+	r.Controller.Create(*vm, id, config_path)
 
 	s := VmResolver{
 		db: r.Db,
@@ -228,7 +226,7 @@ func (r *Resolver) PowerON(args struct{ VmID graphql.ID }) (*VmResolver, error) 
 
 	query := vm.Name
 
-	err = r.Controller.Handler.PowerOn(query)
+	err = r.Controller.PowerOn(query)
 	if err != nil {
 		return nil, err
 	}
@@ -252,7 +250,7 @@ func (r *Resolver) PowerOFF(args struct{ VmID graphql.ID }) (*VmResolver, error)
 	}
 
 	query := vm.Name
-	err = r.Controller.Handler.Shutdown(query)
+	err = r.Controller.Shutdown(query)
 	if err != nil {
 		return nil, err
 	}
@@ -278,7 +276,7 @@ func (r *Resolver) ForceOFF(args struct{ VmID graphql.ID }) (*bool, error) {
 	}
 
 	query := vm.Name
-	err = r.Controller.Handler.ForceOFF(query)
+	err = r.Controller.ForceOFF(query)
 	if err != nil {
 		return &b, err
 	}
@@ -304,7 +302,7 @@ func (r *Resolver) DestroyVM(args struct{ VmID graphql.ID }) (*bool, error) {
 	}
 
 	query := vm.Name
-	err = r.Controller.Handler.Destroy(query)
+	err = r.Controller.Destroy(query)
 	if err != nil {
 		return &b, err
 	}
@@ -373,7 +371,7 @@ func (r *Resolver) DetachDevice(args struct{ DevID, VmID graphql.ID }) (*bool, e
 		return nil, err
 	}
 
-	err = r.Controller.Handler.DetachDevice(*vm, *dev)
+	err = r.Controller.DetachDevice(*vm, *dev)
 	if err != nil {
 		return nil, err
 	}
@@ -393,7 +391,7 @@ func (r *Resolver) AttachDevice(args struct{ DevID, VmID graphql.ID }) (*bool, e
 		return nil, err
 	}
 
-	err = r.Controller.Handler.AttachDevice(*vm, *dev)
+	err = r.Controller.AttachDevice(*vm, *dev)
 	if err != nil {
 		return nil, err
 	}

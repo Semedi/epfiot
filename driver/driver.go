@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-type Driver interface {
+type Provider interface {
 	Init()
 	Create(vm model.Vm, uid uint, config_path *string)
 	AttachDevice(vm model.Vm, dev model.Hostdev) error
@@ -19,12 +19,8 @@ type Driver interface {
 	Close()
 }
 
-type Controller struct {
-	Handler Driver
-}
-
-func New(d string, uri string) *Controller {
-	var drv Driver
+func New(d string, uri string) Provider {
+	var drv Provider
 	switch d {
 	case "kvm":
 		drv = New_kvm(uri)
@@ -32,13 +28,7 @@ func New(d string, uri string) *Controller {
 		log.Fatalf("Unrecognized Driver")
 	}
 
-	c := &Controller{Handler: drv}
+	drv.Init()
 
-	c.Handler.Init()
-
-	return c
-}
-
-func (c *Controller) Start() {
-	c.Handler.Close()
+	return drv
 }
