@@ -77,6 +77,24 @@ func write_config(t interface{}, filename string) {
 	ioutil.WriteFile(filename, d, 0644)
 }
 
+func net_dhcp() []Subnet {
+	return []Subnet{
+		{Type: "dhcp"},
+	}
+}
+
+func net_static() []Subnet {
+	return []Subnet{
+		{
+			Type:            "static",
+			Address:         "10.0.0.2",
+			Netmask:         "255.255.255.0",
+			Gateway:         "10.0.0.1",
+			Dns_nameservers: []string{"10.0.0.1", "8.8.8.8"},
+		},
+	}
+}
+
 func Create_config(vmname string, c *model.ConfigInput) (*string, error) {
 
 	if c == nil {
@@ -88,18 +106,9 @@ func Create_config(vmname string, c *model.ConfigInput) (*string, error) {
 	t3.Network.Version = 1
 	t3.Network.Config = []Nconfig{
 		{
-			Type: "physical",
-			Name: "enp2s1",
-			Subnets: []Subnet{
-				//{Type: "dhcp"},
-				{
-					Type:            "static",
-					Address:         "10.0.0.2",
-					Netmask:         "255.255.255.0",
-					Gateway:         "10.0.0.1",
-					Dns_nameservers: []string{"10.0.0.1", "8.8.8.8"},
-				},
-			},
+			Type:    "physical",
+			Name:    "enp2s1",
+			Subnets: net_dhcp(),
 		},
 	}
 

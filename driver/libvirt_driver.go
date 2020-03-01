@@ -308,8 +308,8 @@ func (l *Libvirt) AttachDevice(vm model.Vm, hdev model.Hostdev) error {
 	return nil
 }
 
-func setDevices(d *libvirtxml.Domain, ilocation string, vm model.Vm, config_path *string) {
-	d.Devices.Interfaces = []libvirtxml.DomainInterface{
+func unmanaged_interface() []libvirtxml.DomainInterface {
+	return []libvirtxml.DomainInterface{
 		{
 			Source: &libvirtxml.DomainInterfaceSource{
 				Bridge: &libvirtxml.DomainInterfaceSourceBridge{
@@ -318,6 +318,23 @@ func setDevices(d *libvirtxml.Domain, ilocation string, vm model.Vm, config_path
 			},
 		},
 	}
+}
+
+func managed_interface() []libvirtxml.DomainInterface {
+	return []libvirtxml.DomainInterface{
+		{
+
+			Source: &libvirtxml.DomainInterfaceSource{
+				Network: &libvirtxml.DomainInterfaceSourceNetwork{
+					Network: "epfiot_managed",
+				},
+			},
+		},
+	}
+}
+
+func setDevices(d *libvirtxml.Domain, ilocation string, vm model.Vm, config_path *string) {
+	d.Devices.Interfaces = managed_interface()
 
 	if vm.Dev != nil {
 
