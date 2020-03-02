@@ -327,6 +327,7 @@ func (db *DB) addVm(input vmInput, userid uint) (*model.Vm, error) {
 		OwnerID: userid,
 		Dev:     devices,
 		Things:  things,
+		State:   "POWEROFF",
 	}
 
 	err := db.DB.Create(&vm).Error

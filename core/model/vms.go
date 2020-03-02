@@ -13,6 +13,7 @@ type Vm struct {
 	Memory  int
 	Vcpu    int
 	Ip      string
+	State   string
 	Dev     []Hostdev `gorm:"foreignkey:VmID"`
 	Things  []Thing   `gorm:"foreignkey:VmID"`
 }

@@ -39,6 +39,7 @@ type Vm {
   vcpu: Int
   memory: Int
   ip: String
+  state: String
   dev: [Hostdev]
   things: [Thing]
 }

@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"fmt"
 	graphql "github.com/graph-gophers/graphql-go"
 	"github.com/semedi/epfiot/core/model"
 	"github.com/semedi/epfiot/driver"
@@ -62,6 +63,10 @@ func (r *Resolver) GetVms(ctx context.Context) (*[]*VmResolver, error) {
 
 	v := make([]*VmResolver, len(vms))
 	for i := range vms {
+		if vms[i].Ip == "" {
+			fmt.Printf("hola")
+		}
+
 		v[i] = &VmResolver{
 			db: r.Db,
 			m:  vms[i],
@@ -226,11 +231,13 @@ func (r *Resolver) PowerON(args struct{ VmID graphql.ID }) (*VmResolver, error) 
 		return nil, err
 	}
 
+	vm.State = "RUNNING"
+	r.Db.Savevm(vm)
+
 	return &VmResolver{
 		db: r.Db,
 		m:  *vm,
 	}, nil
-
 }
 
 func (r *Resolver) PowerOFF(args struct{ VmID graphql.ID }) (*VmResolver, error) {
@@ -249,6 +256,8 @@ func (r *Resolver) PowerOFF(args struct{ VmID graphql.ID }) (*VmResolver, error)
 	if err != nil {
 		return nil, err
 	}
+
+	vm.State = "POWEROFF"
 
 	return &VmResolver{
 		db: r.Db,
