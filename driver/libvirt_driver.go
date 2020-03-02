@@ -90,6 +90,19 @@ func (l *Libvirt) Close() {
 	defer l.conn.Close()
 }
 
+/*
+* Private
+ */
+func state(dom libvirt.Domain) (libvirt.DomainState, error) {
+
+	info, err := dom.GetInfo()
+	if err != nil {
+		return -1, err
+	}
+
+	return info.State, nil
+}
+
 func (l *Libvirt) get(query string) (bool, *libvirt.Domain) {
 	doms := l.get_all()
 
@@ -100,6 +113,7 @@ func (l *Libvirt) get(query string) (bool, *libvirt.Domain) {
 		}
 
 		if name == query {
+
 			return true, &dom
 		}
 
@@ -152,6 +166,27 @@ func (l *Libvirt) Shutdown(query string) error {
 	err = dom.Shutdown()
 
 	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (l *Libvirt) Update(vm *model.Vm) error {
+	r, dom := l.get(vm.Name)
+	if r != true {
+		errors.New("domain not found!")
+	}
+
+	if s, err := state(*dom); s == libvirt.DOMAIN_RUNNING {
+		addresses, err := dom.ListAllInterfaceAddresses(0)
+		if err != nil {
+			return err
+		}
+		vm.Ip = addresses[0].Addrs[0].Addr
+
+		return nil
+	} else {
 		return err
 	}
 

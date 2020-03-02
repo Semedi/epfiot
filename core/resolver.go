@@ -2,7 +2,6 @@ package core
 
 import (
 	"context"
-	"fmt"
 	graphql "github.com/graph-gophers/graphql-go"
 	"github.com/semedi/epfiot/core/model"
 	"github.com/semedi/epfiot/driver"
@@ -63,8 +62,9 @@ func (r *Resolver) GetVms(ctx context.Context) (*[]*VmResolver, error) {
 
 	v := make([]*VmResolver, len(vms))
 	for i := range vms {
-		if vms[i].Ip == "" {
-			fmt.Printf("hola")
+		err := r.Controller.Update(&vms[i])
+		if err != nil {
+			return nil, err
 		}
 
 		v[i] = &VmResolver{

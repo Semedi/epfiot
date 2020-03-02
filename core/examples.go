@@ -12,11 +12,14 @@ var users = []model.User{
 // Since the db is torn down and created on every run, I know the above users will have
 // ID's 1, 2, 3
 
-var vms = []model.Vm{
-	model.Vm{Name: "debian7", Base: "null", OwnerID: 3, Memory: 512, Vcpu: 1},
-	model.Vm{Name: "ubuntu", Base: "null", OwnerID: 3},
-}
+var vms = []model.Vm{}
+var things = []model.Thing{}
 
-var things = []model.Thing{
-	model.Thing{Name: "test", Info: "sensor"},
-}
+//var vms = []model.Vm{
+//	model.Vm{Name: "debian7", Base: "null", OwnerID: 3, Memory: 512, Vcpu: 1},
+//	model.Vm{Name: "ubuntu", Base: "null", OwnerID: 3},
+//}
+//
+//var things = []model.Thing{
+//	model.Thing{Name: "test", Info: "sensor"},
+//}

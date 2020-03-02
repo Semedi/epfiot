@@ -11,6 +11,7 @@ type Provider interface {
 	AttachDevice(vm model.Vm, dev model.Hostdev) error
 	DetachDevice(vm model.Vm, dev model.Hostdev) error
 	List()
+	Update(vm *model.Vm) error
 	Listt()
 	Shutdown(query string) error
 	Destroy(query string) error
