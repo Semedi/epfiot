@@ -61,11 +61,17 @@ func (r *Resolver) GetVms(ctx context.Context) (*[]*VmResolver, error) {
 	}
 
 	v := make([]*VmResolver, len(vms))
+	// concurrency point
 	for i := range vms {
+
 		err := r.Controller.Update(&vms[i])
 		if err != nil {
 			return nil, err
 		}
+
+		// lock
+		r.Db.Savevm(&vms[i])
+		// endlock
 
 		v[i] = &VmResolver{
 			db: r.Db,
