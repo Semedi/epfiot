@@ -180,17 +180,21 @@ func (l *Libvirt) Update(vm *model.Vm) error {
 
 	if s, err := state(*dom); s == libvirt.DOMAIN_RUNNING {
 		addresses, err := dom.ListAllInterfaceAddresses(0)
+
 		if err != nil {
 			return err
 		}
-		vm.Ip = addresses[0].Addrs[0].Addr
+
+		if len(addresses) > 0 {
+			vm.Ip = addresses[0].Addrs[0].Addr
+		}
+
+		vm.State = "RUNNING"
 
 		return nil
 	} else {
 		return err
 	}
-
-	return nil
 }
 
 func (l *Libvirt) Destroy(query string) error {

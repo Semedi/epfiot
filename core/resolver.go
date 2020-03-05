@@ -52,6 +52,28 @@ func (r *Resolver) GetUser(ctx context.Context, args struct{ ID graphql.ID }) (*
 	return &s, nil
 }
 
+func (r *Resolver) updateVms() error {
+
+	vms, err := r.Db.getVms()
+	if err != nil {
+		return err
+	}
+
+	for i := range vms {
+		err := r.Controller.Update(&vms[i])
+		if err != nil {
+			return err
+		}
+
+		// lock
+		r.Db.Savevm(&vms[i])
+		// endlock
+
+	}
+
+	return nil
+}
+
 func (r *Resolver) GetVms(ctx context.Context) (*[]*VmResolver, error) {
 	id := ctx.Value("userid").(uint)
 
@@ -237,7 +259,7 @@ func (r *Resolver) PowerON(args struct{ VmID graphql.ID }) (*VmResolver, error) 
 		return nil, err
 	}
 
-	vm.State = "RUNNING"
+	r.Controller.Update(vm)
 	r.Db.Savevm(vm)
 
 	return &VmResolver{

@@ -46,6 +46,9 @@ func NewDB(path string) (*DB, error) {
 	return &DB{db}, nil
 }
 
+// ###########################################################
+// SAVE:
+// ###########################################################
 func (db *DB) Savevm(vm *model.Vm) {
 	db.DB.Save(vm)
 }
@@ -172,6 +175,16 @@ func (db *DB) getVmOwner(id int32) (*model.User, error) {
 		return nil, err
 	}
 	return &u, nil
+}
+
+func (db *DB) getVms() ([]model.Vm, error) {
+	var vms []model.Vm
+	err := db.DB.Find(&vms).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return vms, nil
 }
 
 func (db *DB) getVmDev(p *model.Vm) ([]model.Hostdev, error) {
