@@ -222,6 +222,21 @@ func (l *Libvirt) Destroy(query string) error {
 	return nil
 }
 
+func (l *Libvirt) ForceDestroy(query string) error {
+
+	err := l.ForceOFF(query)
+	if err != nil {
+		return err
+	}
+
+	err = l.Destroy(query)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (l *Libvirt) ForceOFF(query string) error {
 
 	r, dom := l.get(query)

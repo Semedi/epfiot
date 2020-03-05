@@ -76,6 +76,11 @@ func Vmconfig(user uint, name string) string {
 	return fmt.Sprintf("%s/%s.iso", folder(user), name)
 }
 
+func Erasefiles(user uint, name string) {
+	execute("rm", Vmfile(user, name))
+	execute("rm", Vmconfig(user, name))
+}
+
 func Copy_base(base string, user uint, name string) {
 
 	file := basefile(base)

@@ -16,6 +16,7 @@ type Provider interface {
 	Shutdown(query string) error
 	Destroy(query string) error
 	ForceOFF(query string) error
+	ForceDestroy(query string) error
 	PowerOn(query string) error
 	Close()
 }

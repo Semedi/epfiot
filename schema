@@ -27,6 +27,7 @@ type Mutation {
   powerON(vmID: ID!): Vm
   powerOFF(vmID: ID!): Vm
   destroyVM(vmID: ID!): Boolean
+  forceDestroyVM(vmID: ID!): Boolean
   forceOFF(vmID: ID!): Boolean
 }
 

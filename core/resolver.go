@@ -294,6 +294,7 @@ func (r *Resolver) PowerOFF(args struct{ VmID graphql.ID }) (*VmResolver, error)
 
 }
 
+//refactor
 func (r *Resolver) ForceOFF(args struct{ VmID graphql.ID }) (*bool, error) {
 	vmID, err := gqlIDToUint(args.VmID)
 	b := false
@@ -317,10 +318,41 @@ func (r *Resolver) ForceOFF(args struct{ VmID graphql.ID }) (*bool, error) {
 	return &b, nil
 }
 
+//refactor
+func (r *Resolver) ForceDestroyVM(ctx context.Context, args struct{ VmID graphql.ID }) (*bool, error) {
+	id := ctx.Value("userid").(uint)
+
+	vmID, err := gqlIDToUint(args.VmID)
+	b := false
+
+	if err != nil {
+		return &b, err
+	}
+
+	vm, err := r.Db.getVm(vmID)
+	if err != nil {
+		return &b, err
+	}
+
+	query := vm.Name
+	err = r.Controller.ForceDestroy(query)
+	if err != nil {
+		return &b, err
+	}
+
+	driver.Erasefiles(id, query)
+
+	b = true
+	return &b, nil
+
+}
+
 // TODO:
 //	ERASE VM FROM DATABASE
 //  DELETE DISK IN DRIVER OPERATION
-func (r *Resolver) DestroyVM(args struct{ VmID graphql.ID }) (*bool, error) {
+func (r *Resolver) DestroyVM(ctx context.Context, args struct{ VmID graphql.ID }) (*bool, error) {
+	id := ctx.Value("userid").(uint)
+
 	vmID, err := gqlIDToUint(args.VmID)
 	b := false
 
@@ -338,6 +370,8 @@ func (r *Resolver) DestroyVM(args struct{ VmID graphql.ID }) (*bool, error) {
 	if err != nil {
 		return &b, err
 	}
+
+	driver.Erasefiles(id, query)
 
 	b = true
 	return &b, nil
