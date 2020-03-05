@@ -213,7 +213,7 @@ func (l *Libvirt) Destroy(query string) error {
 	if info.State == 5 {
 
 		// delete nvram file
-		err := dom.UndefineFlags(4)
+		err := dom.UndefineFlags(7)
 		if err != nil {
 			return err
 		}
