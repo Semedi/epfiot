@@ -95,7 +95,7 @@ func net_static() []Subnet {
 	}
 }
 
-func Create_config(vmname string, c *model.ConfigInput) (*string, error) {
+func Create_config(user uint, vmname string, c *model.ConfigInput) (*string, error) {
 
 	if c == nil {
 		return nil, nil
@@ -167,9 +167,10 @@ func Create_config(vmname string, c *model.ConfigInput) (*string, error) {
 		return nil, err
 	}
 
+	config_path := Vmconfig(user, vmname)
 	// copy to remote
 	if Connection[METHOD] == "ssh" {
-		dest_cmd := fmt.Sprintf("%s %s:%s", cd, Connection[HOST], Location)
+		dest_cmd := fmt.Sprintf("%s %s:%s", cd, Connection[HOST], config_path)
 
 		cmd := exec.Command("scp", strings.Fields(dest_cmd)...)
 		err := cmd.Run()
@@ -178,7 +179,5 @@ func Create_config(vmname string, c *model.ConfigInput) (*string, error) {
 		}
 	}
 
-	final_path := fmt.Sprintf("%s/%s", Location, filepath.Base(cd))
-
-	return &final_path, nil
+	return &config_path, nil
 }

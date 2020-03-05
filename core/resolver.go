@@ -211,7 +211,7 @@ func (r *Resolver) CreateVm(ctx context.Context, args struct{ Vm vmInput }) (*Vm
 	}
 	// end concurrency
 
-	config_path, err := driver.Create_config(args.Vm.Name, args.Vm.Config)
+	config_path, err := driver.Create_config(id, args.Vm.Name, args.Vm.Config)
 	if err != nil {
 		return nil, err
 	}
