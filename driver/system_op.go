@@ -13,7 +13,8 @@ var Location string
 var Connection []string
 
 func Initfs(l string, auth_host []string) {
-	execute("mkdir", "-p", "/storage/base")
+	Location = l
+	execute("mkdir", "-p", Location+"/base")
 }
 
 func Usb_info() [][]string {
