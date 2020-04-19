@@ -16,7 +16,6 @@ func init() {
 	loggedUserSession.Options = &sessions.Options{
 		// change domain to match your machine. Can be localhost
 		// IF the Domain name doesn't match, your session will be EMPTY!
-		Domain:   "localhost",
 		Path:     "/",
 		MaxAge:   3600 * 3, // 3 hours
 		HttpOnly: true,

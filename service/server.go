@@ -171,7 +171,7 @@ func (s *Server) Run() {
 
 	log.WithFields(log.Fields{"time": time.Now()}).Info("starting server")
 
-	log.Fatal(http.ListenAndServe("localhost:8080", logged(mux)))
+	log.Fatal(http.ListenAndServe("0.0.0.0:8080", logged(mux)))
 }
 
 func authenticated(next http.Handler) http.Handler {
