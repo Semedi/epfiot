@@ -14,6 +14,7 @@ var Connection []string
 
 func Initfs(l string, auth_host []string) {
 	Location = l
+	Connection = auth_host
 	execute("mkdir", "-p", Location+"/base")
 }
 
