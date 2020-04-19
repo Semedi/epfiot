@@ -1,6 +1,5 @@
 package driver
 
-import "os"
 import "os/exec"
 import "log"
 import "fmt"
@@ -14,15 +13,16 @@ var Location string
 var Connection []string
 
 func Initfs(l string, auth_host []string) {
-	mode := int(0755)
-
-	Connection = auth_host
-	Location = l
-	_ = os.MkdirAll(Location+"/base", os.FileMode(mode))
+	execute("mkdir", "-p", "/storage/base")
 }
 
 func Usb_info() [][]string {
-	info := execute("lsusb")
+	info, err := execute("lsusb")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	scanner := bufio.NewScanner(strings.NewReader(info))
 
 	a := [][]string{}
@@ -39,7 +39,7 @@ func Usb_info() [][]string {
 	return a
 }
 
-func execute(parameters ...string) string {
+func execute(parameters ...string) (string, error) {
 
 	if Connection != nil {
 		parameters = append(Connection, parameters...)
@@ -51,10 +51,11 @@ func execute(parameters ...string) string {
 	if err != nil {
 		msg := fmt.Sprintf("the next command has failed:\n   %s", strings.Join(parameters, " "))
 		fmt.Println(msg)
-		log.Fatal(err)
+
+		return "", err
 	}
 
-	return string(out)
+	return string(out), nil
 }
 
 func folder(user uint) string {
@@ -85,9 +86,10 @@ func Copy_base(base string, user uint, name string) {
 
 	file := basefile(base)
 
-	if _, err := os.Stat(file); os.IsNotExist(err) {
-		log.Fatalf(file)
-		log.Fatalf("file not exists something bad happened!")
+	_, err := execute("stat", file)
+
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	execute("cp", file, Vmfile(user, name))
