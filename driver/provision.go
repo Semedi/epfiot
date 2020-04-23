@@ -2,15 +2,16 @@ package driver
 
 import (
 	"fmt"
-	"github.com/kless/osutil/user/crypt/sha512_crypt"
-	"github.com/semedi/epfiot/core/model"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/kless/osutil/user/crypt/sha512_crypt"
+	"github.com/semedi/epfiot/core/model"
+	"gopkg.in/yaml.v2"
 )
 
 //----------------------------
@@ -107,7 +108,7 @@ func Create_config(user uint, vmname string, c *model.ConfigInput) (*string, err
 	t3.Network.Config = []Nconfig{
 		{
 			Type:    "physical",
-			Name:    "enp2s1",
+			Name:    "enp6s1",
 			Subnets: net_dhcp(),
 		},
 	}
