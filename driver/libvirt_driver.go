@@ -41,7 +41,7 @@ func domain_def(name string, vcpu int) libvirtxml.Domain {
 			Type: &libvirtxml.DomainOSType{
 				Arch:    "x86_64",
 				Type:    "hvm",
-				Machine: "pc-q35-3.1",
+				Machine: "pc-q35-2.8",
 			},
 			Loader: &libvirtxml.DomainLoader{
 				Path:     "/usr/share/OVMF/OVMF_CODE.fd",
