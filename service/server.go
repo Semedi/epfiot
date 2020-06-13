@@ -10,10 +10,11 @@ import (
 	graphql "github.com/graph-gophers/graphql-go"
 	"github.com/graph-gophers/graphql-go/relay"
 
+	"html/template"
+
 	"github.com/semedi/epfiot/core"
 	"github.com/semedi/epfiot/driver"
 	"golang.org/x/crypto/bcrypt"
-	"html/template"
 )
 
 // templates:
@@ -153,7 +154,7 @@ func (s *Server) Run() {
 	}
 
 	database := s.db
-	r := &core.Resolver{Db: database, Controller: s.c}
+	r := core.NewResolver(database, s.c)
 
 	schema := graphql.MustParseSchema(string(fileschema), r, graphql.UseStringDescriptions())
 

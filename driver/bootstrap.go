@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net"
 	"strings"
+
+	"github.com/semedi/epfiot/core/model"
 )
 
 /*
@@ -108,10 +110,24 @@ func bootstrap_register(request petition) error {
 	return nil
 }
 
-func server_request() error {
+func Server_request() error {
 	pet := new_petition(SERVER)
 	pet.add(new_command(server.ID, "2"))
 	pet.add(new_command(server.URI, "coap://localhost:5683"))
+	pet.add(new_command(server.BOOTSTRAP, "no"))
+	pet.add(new_command(server.LIFETIME, "300"))
+	pet.add(new_command(server.SECURITY, "NoSec"))
+
+	return bootstrap_register(*pet)
+}
+
+func New_server(vm model.Vm) error {
+	pet := new_petition(SERVER)
+	pet.add(new_command(server.ID, fmt.Sprint(vm.Model.ID)))
+
+	uri := fmt.Sprintf("coap://%s:5683", vm.Ip)
+	pet.add(new_command(server.URI, uri))
+
 	pet.add(new_command(server.BOOTSTRAP, "no"))
 	pet.add(new_command(server.LIFETIME, "300"))
 	pet.add(new_command(server.SECURITY, "NoSec"))

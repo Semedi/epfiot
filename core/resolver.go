@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+
 	graphql "github.com/graph-gophers/graphql-go"
 	"github.com/semedi/epfiot/core/model"
 	"github.com/semedi/epfiot/driver"
@@ -10,6 +11,7 @@ import (
 type Resolver struct {
 	Db         *DB
 	Controller driver.Provider
+	vm_server  map[string]string
 }
 
 // vmInput has everything needed to do adds and updates on a vm
@@ -29,6 +31,40 @@ type thingInput struct {
 	ID   *graphql.ID
 	Name string
 	Info string
+}
+
+func NewResolver(db *DB, controller driver.Provider) *Resolver {
+	return &Resolver{
+		Db:         db,
+		Controller: controller,
+		vm_server:  make(map[string]string),
+	}
+
+}
+
+func (r *Resolver) Update(vm *model.Vm) error {
+	err := r.Controller.Update(vm)
+	if err != nil {
+		return err
+	}
+
+	if vm.Ip != "" {
+		if _, ok := r.vm_server[vm.Name]; !ok {
+			err = driver.New_server(*vm)
+			if err != nil {
+				return err
+			}
+
+			r.vm_server[vm.Name] = vm.Ip
+		}
+
+	}
+
+	// lock
+	r.Db.Savevm(vm)
+	// endlock
+
+	return nil
 }
 
 // GetUser resolves the getUser query
@@ -60,15 +96,7 @@ func (r *Resolver) updateVms() error {
 	}
 
 	for i := range vms {
-		err := r.Controller.Update(&vms[i])
-		if err != nil {
-			return err
-		}
-
-		// lock
-		r.Db.Savevm(&vms[i])
-		// endlock
-
+		r.Update(&vms[i])
 	}
 
 	return nil
@@ -86,14 +114,10 @@ func (r *Resolver) GetVms(ctx context.Context) (*[]*VmResolver, error) {
 	// concurrency point
 	for i := range vms {
 
-		err := r.Controller.Update(&vms[i])
+		err := r.Update(&vms[i])
 		if err != nil {
 			return nil, err
 		}
-
-		// lock
-		r.Db.Savevm(&vms[i])
-		// endlock
 
 		v[i] = &VmResolver{
 			db: r.Db,
@@ -259,8 +283,10 @@ func (r *Resolver) PowerON(args struct{ VmID graphql.ID }) (*VmResolver, error) 
 		return nil, err
 	}
 
-	r.Controller.Update(vm)
-	r.Db.Savevm(vm)
+	err = r.Update(vm)
+	if err != nil {
+		return nil, err
+	}
 
 	return &VmResolver{
 		db: r.Db,
