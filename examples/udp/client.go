@@ -84,8 +84,26 @@ func new_command(key string, value string) command {
 func (p *petition) add(c command) {
 	p.commands = append(p.commands, c)
 }
+func bootstrap_register(request petition) error {
+	p := make([]byte, 2048)
+	conn, err := net.Dial("udp", "127.0.0.1:5400")
+	if err != nil {
+		return err
+	}
 
-func main() {
+	fmt.Fprintf(conn, request.out())
+	_, err = bufio.NewReader(conn).Read(p)
+	if err == nil {
+		fmt.Printf("%s\n", p)
+	} else {
+		return err
+	}
+	conn.Close()
+
+	return nil
+}
+
+func server_example() {
 	pet := new_petition(SERVER)
 
 	pet.add(new_command(server.ID, "2"))
@@ -95,20 +113,22 @@ func main() {
 	pet.add(new_command(server.SECURITY, "NoSec"))
 
 	fmt.Printf(pet.out())
+	bootstrap_register(*pet)
 
-	p := make([]byte, 2048)
-	conn, err := net.Dial("udp", "127.0.0.1:5400")
-	if err != nil {
-		fmt.Printf("Some error %v", err)
-		return
-	}
+}
 
-	fmt.Fprintf(conn, pet.out())
-	_, err = bufio.NewReader(conn).Read(p)
-	if err == nil {
-		fmt.Printf("%s\n", p)
-	} else {
-		fmt.Printf("Some error %v\n", err)
-	}
-	conn.Close()
+func endpoint_example() {
+	pet := new_petition(ENDPOINT)
+
+	pet.add(new_command(endpoint.NAME, "prueba"))
+	pet.add(new_command(endpoint.DELETE, "/0"))
+	pet.add(new_command(endpoint.DELETE, "/1"))
+	pet.add(new_command(endpoint.SERVER, "1"))
+
+	fmt.Printf(pet.out())
+	bootstrap_register(*pet)
+}
+
+func main() {
+	endpoint_example()
 }
