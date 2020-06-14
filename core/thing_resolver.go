@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+
 	graphql "github.com/graph-gophers/graphql-go"
 	"github.com/semedi/epfiot/core/model"
 )
@@ -24,4 +25,8 @@ func (t *ThingResolver) Name(ctx context.Context) *string {
 // Info resolves the info field
 func (t *ThingResolver) Info(ctx context.Context) *string {
 	return &t.m.Info
+}
+
+func (t *ThingResolver) Server(ctx context.Context) *string {
+	return &t.m.Server
 }

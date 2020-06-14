@@ -1,8 +1,9 @@
 package driver
 
 import (
-	"github.com/semedi/epfiot/core/model"
 	"log"
+
+	"github.com/semedi/epfiot/core/model"
 )
 
 type Provider interface {

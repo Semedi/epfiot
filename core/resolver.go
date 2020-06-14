@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"errors"
 
 	graphql "github.com/graph-gophers/graphql-go"
 	"github.com/semedi/epfiot/core/model"
@@ -11,7 +12,7 @@ import (
 type Resolver struct {
 	Db         *DB
 	Controller driver.Provider
-	vm_server  map[string]string
+	vm_server  map[string]uint
 }
 
 // vmInput has everything needed to do adds and updates on a vm
@@ -28,16 +29,17 @@ type vmInput struct {
 }
 
 type thingInput struct {
-	ID   *graphql.ID
-	Name string
-	Info string
+	ID     *graphql.ID
+	Name   string
+	Info   string
+	Server string
 }
 
 func NewResolver(db *DB, controller driver.Provider) *Resolver {
 	return &Resolver{
 		Db:         db,
 		Controller: controller,
-		vm_server:  make(map[string]string),
+		vm_server:  make(map[string]uint),
 	}
 
 }
@@ -55,7 +57,7 @@ func (r *Resolver) Update(vm *model.Vm) error {
 				return err
 			}
 
-			r.vm_server[vm.Name] = vm.Ip
+			r.vm_server[vm.Name] = vm.Model.ID
 		}
 
 	}
@@ -512,8 +514,19 @@ func (r *Resolver) DeleteVm(args struct{ UserID, VmID graphql.ID }) (*bool, erro
 }
 
 func (r *Resolver) CreateThing(ctx context.Context, args struct{ Thing thingInput }) (*ThingResolver, error) {
-	t, err := r.Db.AddThing(args.Thing)
 
+	vmname := args.Thing.Server
+	if _, ok := r.vm_server[vmname]; !ok {
+		return nil, errors.New("Requested server does not exist or it's offline")
+	}
+
+	t, err := r.Db.AddThing(args.Thing)
+	if err != nil {
+		return nil, err
+	}
+
+	vmid := r.vm_server[vmname]
+	err = driver.New_thing(vmid, *t)
 	if err != nil {
 		return nil, err
 	}

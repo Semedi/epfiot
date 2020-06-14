@@ -110,13 +110,22 @@ func bootstrap_register(request petition) error {
 	return nil
 }
 
-func Server_request() error {
+func Server_example() error {
 	pet := new_petition(SERVER)
 	pet.add(new_command(server.ID, "2"))
 	pet.add(new_command(server.URI, "coap://localhost:5683"))
 	pet.add(new_command(server.BOOTSTRAP, "no"))
 	pet.add(new_command(server.LIFETIME, "300"))
 	pet.add(new_command(server.SECURITY, "NoSec"))
+
+	return bootstrap_register(*pet)
+}
+
+func thing_example() error {
+	pet := new_petition(ENDPOINT)
+	pet.add(new_command(endpoint.DELETE, "/0"))
+	pet.add(new_command(endpoint.DELETE, "/1"))
+	pet.add(new_command(endpoint.SERVER, "2"))
 
 	return bootstrap_register(*pet)
 }
@@ -135,11 +144,12 @@ func New_server(vm model.Vm) error {
 	return bootstrap_register(*pet)
 }
 
-func thing_request() error {
+func New_thing(server uint, thing model.Thing) error {
 	pet := new_petition(ENDPOINT)
+	pet.add(new_command(endpoint.NAME, thing.Name))
 	pet.add(new_command(endpoint.DELETE, "/0"))
 	pet.add(new_command(endpoint.DELETE, "/1"))
-	pet.add(new_command(endpoint.SERVER, "2"))
+	pet.add(new_command(endpoint.SERVER, fmt.Sprint(server)))
 
 	return bootstrap_register(*pet)
 }

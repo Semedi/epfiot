@@ -392,8 +392,9 @@ func (db *DB) getThing(id uint) (*model.Thing, error) {
 
 func (db *DB) AddThing(input thingInput) (*model.Thing, error) {
 	thing := model.Thing{
-		Name: input.Name,
-		Info: input.Info,
+		Name:   input.Name,
+		Info:   input.Info,
+		Server: input.Server,
 	}
 
 	err := db.DB.Create(&thing).Error

@@ -110,4 +110,5 @@ input ThingInput {
   id: ID
   name: String!
   info: String!
+  server: String!
 }
