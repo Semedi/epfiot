@@ -370,9 +370,7 @@ func (r *Resolver) ForceDestroyVM(ctx context.Context, args struct{ VmID graphql
 
 	driver.Erasefiles(id, query)
 
-	b = true
-	return &b, nil
-
+	return r.Db.deleteVm(id, vmID)
 }
 
 // TODO:
@@ -401,9 +399,7 @@ func (r *Resolver) DestroyVM(ctx context.Context, args struct{ VmID graphql.ID }
 
 	driver.Erasefiles(id, query)
 
-	b = true
-	return &b, nil
-
+	return r.Db.deleteVm(id, vmID)
 }
 
 // TODO:
