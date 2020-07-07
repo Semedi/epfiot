@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"net"
 	"strings"
+	"time"
 
 	"github.com/semedi/epfiot/core/model"
+	log "github.com/sirupsen/logrus"
 )
 
 /*
@@ -94,7 +96,9 @@ func (p *petition) add(c command) {
 func bootstrap_register(request petition) error {
 	p := make([]byte, 2048)
 	conn, err := net.Dial("udp", "127.0.0.1:5400")
+
 	if err != nil {
+		log.WithFields(log.Fields{"time": time.Now()}).Error("couldn't connect with bootstrap service")
 		return err
 	}
 
@@ -103,6 +107,7 @@ func bootstrap_register(request petition) error {
 	if err == nil {
 		fmt.Printf("%s\n", p)
 	} else {
+		log.WithFields(log.Fields{"time": time.Now()}).Error("failed when communicating with bootstrap service")
 		return err
 	}
 	conn.Close()

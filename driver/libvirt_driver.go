@@ -3,8 +3,10 @@ package driver
 import (
 	"errors"
 	"fmt"
-	"log"
 	"strconv"
+	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	libvirt "github.com/libvirt/libvirt-go"
 	libvirtxml "github.com/libvirt/libvirt-go-xml"
@@ -456,12 +458,14 @@ func (l *Libvirt) Create(vm model.Vm, uid uint, config_path *string) {
 		panic(err)
 	}
 
-	fmt.Println(xml)
+	log.WithFields(log.Fields{"time": time.Now()}).Info("vm xml generated")
 
-	domain, err := l.conn.DomainDefineXML(xml)
+	dom, err := l.conn.DomainDefineXML(xml)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(domain.GetName())
+	name, _ := dom.GetName()
+
+	log.WithFields(log.Fields{"time": time.Now()}).Info("vm %s created", name)
 }

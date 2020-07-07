@@ -54,7 +54,6 @@ func render(cond string, file string, w http.ResponseWriter, r *http.Request) {
 	conditionsMap := map[string]interface{}{}
 	islogged, user := Current(r)
 	if islogged == true {
-		log.Println("Username : ", user)
 		conditionsMap["Username"] = user
 		conditionsMap[cond] = true
 
@@ -63,6 +62,8 @@ func render(cond string, file string, w http.ResponseWriter, r *http.Request) {
 		}
 
 	} else {
+
+		log.WithFields(log.Fields{"time": time.Now()}).Warn("Trying to access with an expired session!")
 		http.Redirect(w, r, "/login", http.StatusForbidden)
 	}
 
@@ -103,9 +104,8 @@ func LoginPageHandler(res *core.Resolver) http.Handler {
 		if islogged == true {
 
 			conditionsMap["Username"] = user
-			log.Println("entro en logeado")
-
 			http.Redirect(w, r, "/dashboard", http.StatusFound)
+
 		} else {
 
 			// verify username and password

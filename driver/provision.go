@@ -3,11 +3,14 @@ package driver
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
+
+	log "github.com/sirupsen/logrus"
+
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/kless/osutil/user/crypt/sha512_crypt"
 	"github.com/semedi/epfiot/core/model"
@@ -66,10 +69,13 @@ type Metadata struct {
 func write_config(t interface{}, filename string) {
 
 	d, err := yaml.Marshal(&t)
+
+	log.WithFields(log.Fields{"time": time.Now()}).Info("Creating %s", filename)
+
 	if err != nil {
-		log.Fatalf("error: %v", err)
+		log.WithFields(log.Fields{"time": time.Now()}).Error("error creating yaml: %v", err)
 	}
-	fmt.Printf("--- yaml dump:\n%s\n\n", string(d))
+	//fmt.Printf("--- yaml dump:\n%s\n\n", string(d))
 
 	if filepath.Base(filename) == "user-data" {
 		d = append([]byte("#cloud-config\n"), d...)
@@ -165,6 +171,8 @@ func Create_config(user uint, vmname string, c *model.ConfigInput) (*string, err
 
 	err := cmd.Run()
 	if err != nil {
+		log.WithFields(log.Fields{"time": time.Now()}).Error("failed when creating cdrom image with genisoimage")
+
 		return nil, err
 	}
 
