@@ -160,10 +160,19 @@ func (db *DB) getHostdevices() ([]model.Hostdev, error) {
 // GetVm should authorize the user and  return a vm or error
 func (db *DB) getVm(id uint) (*model.Vm, error) {
 	var p model.Vm
+
 	err := db.DB.First(&p, id).Error
 	if err != nil {
 		return nil, err
 	}
+
+	return &p, nil
+}
+
+func (db *DB) getVmbyName(vm string) (*model.Vm, error) {
+	var p model.Vm
+
+	db.DB.Where("name = ?", vm).First(&p)
 
 	return &p, nil
 }
@@ -386,6 +395,14 @@ func (db *DB) getThing(id uint) (*model.Thing, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	return &t, nil
+}
+
+func (db *DB) getThingbyName(thing string) (*model.Thing, error) {
+	var t model.Thing
+
+	db.DB.Where("name = ?", thing).First(&t)
 
 	return &t, nil
 }

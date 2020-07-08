@@ -535,6 +535,26 @@ func (r *Resolver) CreateThing(ctx context.Context, args struct{ Thing thingInpu
 	return &s, nil
 }
 
+func (r *Resolver) ThingBootstrapped(thing string) error {
+	t, err := r.Db.getThingbyName(thing)
+
+	if err != nil {
+		return err
+	}
+
+	vmname := t.Server
+
+	v, err := r.Db.getVmbyName(vmname)
+	if err != nil {
+		return err
+	}
+
+	v.Things = append(v.Things, *t)
+	r.Db.Savevm(v)
+
+	return nil
+}
+
 // TODO:
 // send udp request to bootstrap if have ip
 func (r *Resolver) CreateThingVm(ctx context.Context, args struct {

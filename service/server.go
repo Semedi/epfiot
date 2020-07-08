@@ -142,8 +142,12 @@ func BootstrapHandler(res *core.Resolver) http.Handler {
 
 		r.ParseForm()
 		thing := r.Form.Get("name")
-
 		log.WithFields(log.Fields{"time": time.Now()}).Info("Thing pairing completed: ", thing)
+
+		err := res.ThingBootstrapped(thing)
+		if err != nil {
+			log.WithFields(log.Fields{"time": time.Now()}).Error("Error pairing ", thing)
+		}
 	})
 }
 
