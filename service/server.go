@@ -137,6 +137,16 @@ func LoginPageHandler(res *core.Resolver) http.Handler {
 
 }
 
+func BootstrapHandler(res *core.Resolver) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		r.ParseForm()
+		thing := r.Form.Get("name")
+
+		log.WithFields(log.Fields{"time": time.Now()}).Info("Thing pairing completed: ", thing)
+	})
+}
+
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	Close(w, r)
@@ -167,6 +177,7 @@ func (s *Server) Run() {
 	mux.Handle("/docs", DocsPage())
 	mux.Handle("/logout", http.HandlerFunc(LogoutHandler))
 	mux.Handle("/query", authenticated(&relay.Handler{Schema: schema}))
+	mux.Handle("/bootstrap", BootstrapHandler(r))
 
 	mux.Handle("/static/", http.StripPrefix("/static", fs))
 
