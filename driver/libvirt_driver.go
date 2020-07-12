@@ -110,8 +110,8 @@ func (l *Libvirt) get(query string) (bool, *libvirt.Domain) {
 
 	for _, dom := range doms {
 		name, err := dom.GetName()
-		if err == nil {
-			fmt.Printf("  %s\n", name)
+		if err != nil {
+			return false, nil
 		}
 
 		if name == query {
@@ -195,6 +195,9 @@ func (l *Libvirt) Update(vm *model.Vm) error {
 
 		return nil
 	} else {
+
+		vm.State = "POWEROFF"
+
 		return err
 	}
 }
